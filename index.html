@@ -195,12 +195,15 @@
 
             <!-- Floating Overlay Dashboard Controls -->
             <div class="absolute top-4 right-4 z-[10] flex flex-col gap-2">
-                <!-- Location Info Card -->
-                <div class="bg-slate-900/90 border border-slate-700/70 backdrop-blur-md rounded-xl p-3 shadow-xl max-w-xs text-xs space-y-1">
-                    <div class="flex items-center justify-between font-semibold text-cyan-400">
+                <!-- Location Info Card with Close Button -->
+                <div id="info-card" class="bg-slate-900/90 border border-slate-700/70 backdrop-blur-md rounded-xl p-3 shadow-xl max-w-xs text-xs space-y-1 relative group">
+                    <div class="flex items-center justify-between font-semibold text-cyan-400 pr-5">
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-snowflake"></i> Iqaluit, NU</span>
                         <span class="text-[10px] text-slate-400">63.7467° N, 68.5170° W</span>
                     </div>
+                    <button onclick="toggleInfoCard()" title="Close Info" class="absolute top-2.5 right-2.5 w-5 h-5 rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
                     <p class="text-slate-300 text-[11px] leading-tight">
                         Capital city of Nunavut located on Frobisher Bay on Baffin Island.
                     </p>
@@ -208,6 +211,9 @@
 
                 <!-- Zoom / Recenter Quick Tool -->
                 <div class="bg-slate-900/90 border border-slate-700/70 backdrop-blur-md rounded-xl p-1.5 shadow-xl flex flex-col gap-1 items-center">
+                    <button id="info-toggle-btn" title="Toggle Location Info" onclick="toggleInfoCard()" class="hidden w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                        <i class="fa-solid fa-info text-xs"></i>
+                    </button>
                     <button title="Recenter Map" onclick="resetMapView()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 flex items-center justify-center transition">
                         <i class="fa-solid fa-location-crosshairs text-sm"></i>
                     </button>
@@ -655,6 +661,14 @@
         function toggleToursModal() {
             const modal = document.getElementById('tours-modal');
             modal.classList.toggle('hidden');
+        }
+
+        function toggleInfoCard() {
+            const infoCard = document.getElementById('info-card');
+            const toggleBtn = document.getElementById('info-toggle-btn');
+            
+            infoCard.classList.toggle('hidden');
+            toggleBtn.classList.toggle('hidden');
         }
 
         function startTour(tourKey) {
