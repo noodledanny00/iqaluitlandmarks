@@ -102,7 +102,15 @@
       font-size: 0.8rem;
       font-weight: bold;
       padding: 6px 12px;
-      border-radius: 6px;
+     // Initialize map centered on Iqaluit
+const map = L.map('map').setView([63.7467, -68.5170], 13);
+
+// Google Maps Roadmap Layer (Free, no API key required)
+L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+  maxZoom: 20,
+  subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+  attribution: '© Google Maps'
+}).addTo(map);
       transition: background 0.2s;
     // Free tile layer (No API key required)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
