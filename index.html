@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iqaluit Landmark Explorer - OpenStreetMap</title>
+    <title>Iqaluit Landmark Explorer - Interactive Map</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Leaflet CSS -->
@@ -39,15 +39,9 @@
         }
     </script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        #map {
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        /* Custom Leaflet popup styling */
+        body { font-family: 'Inter', sans-serif; }
+        #map { width: 100%; height: 100%; z-index: 1; }
+        
         .leaflet-popup-content-wrapper {
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(12px);
@@ -61,34 +55,19 @@
             background: rgba(15, 23, 42, 0.95);
             border: 1px solid rgba(56, 189, 248, 0.3);
         }
-        .leaflet-popup-content {
-            margin: 12px 14px;
-            line-height: 1.5;
-        }
-        /* Custom scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(56, 189, 248, 0.4);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(56, 189, 248, 0.7);
-        }
-        /* Pulsing map pin marker effect */
+        .leaflet-popup-content { margin: 12px 14px; line-height: 1.5; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.4); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.7); }
+
         .pulse-marker {
             box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7);
             animation: pulse-ring 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
         }
         @keyframes pulse-ring {
-            to {
-                box-shadow: 0 0 0 16px rgba(56, 189, 248, 0);
-            }
+            to { box-shadow: 0 0 0 16px rgba(56, 189, 248, 0); }
         }
     </style>
 </head>
@@ -107,21 +86,26 @@
                 </h1>
                 <p class="text-xs text-slate-400 flex items-center gap-2">
                     <span><i class="fa-solid fa-map-pin text-cyan-400 text-[10px]"></i> Nunavut, Canada</span>
-                    <span>•</span>
-                    <span>Powered by OpenStreetMap</span>
                 </p>
             </div>
         </div>
 
         <div class="flex items-center gap-2">
-            <button id="tours-btn" onclick="toggleToursModal()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
+            <!-- Add Place Button -->
+            <button onclick="openAddModal()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl border border-cyan-400/30 transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
+                <i class="fa-solid fa-plus text-sm"></i>
+                <span class="hidden sm:inline">Add Place</span>
+            </button>
+
+            <!-- Guided Tours -->
+            <button onclick="toggleToursModal()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
                 <i class="fa-solid fa-route text-cyan-400"></i>
                 <span class="hidden sm:inline">Guided Tours</span>
             </button>
 
-            <!-- Layer Switcher Dropdown Button -->
+            <!-- Map Layers Switcher -->
             <div class="relative">
-                <button id="map-layers-btn" onclick="toggleLayerMenu()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                <button onclick="toggleLayerMenu()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
                     <i class="fa-solid fa-layer-group text-slate-400"></i>
                     <span class="hidden sm:inline">Map Style</span>
                 </button>
@@ -139,28 +123,26 @@
                 </div>
             </div>
 
-            <!-- Mobile Menu Toggle Button -->
+            <!-- Mobile Sidebar Toggle -->
             <button onclick="toggleSidebar()" class="md:hidden bg-slate-800 hover:bg-slate-700 text-slate-200 p-2.5 rounded-xl border border-slate-700">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Workspace -->
     <div class="flex-1 flex relative overflow-hidden">
         
         <!-- Sidebar Panel -->
         <aside id="sidebar" class="w-full md:w-96 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 flex flex-col z-10 transition-all duration-300 absolute md:relative inset-y-0 left-0 -translate-x-full md:translate-x-0">
             <!-- Search & Filters -->
             <div class="p-4 border-b border-slate-800 space-y-3">
-                <!-- Search Box -->
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
                     <input type="text" id="search-input" onkeyup="filterLandmarks()" placeholder="Search landmarks, cinema, stores..." 
                            class="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
                 </div>
 
-                <!-- Category Filters -->
                 <div class="flex flex-wrap gap-1.5" id="category-pills">
                     <button onclick="setCategoryFilter('all')" class="cat-btn active text-xs px-3 py-1 rounded-lg border bg-cyan-600 text-white border-cyan-500 font-medium">All</button>
                     <button onclick="setCategoryFilter('culture')" class="cat-btn text-xs px-3 py-1 rounded-lg border bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200">Culture</button>
@@ -170,28 +152,27 @@
                 </div>
             </div>
 
-            <!-- Landmark List Container -->
+            <!-- Landmark List -->
             <div class="flex-1 overflow-y-auto p-4 space-y-3" id="landmark-list">
-                <!-- Dynamic Content Injected Here -->
+                <!-- Dynamically Populated -->
             </div>
 
-            <!-- Footer Stats & Info -->
+            <!-- Footer Stats -->
             <div class="p-3 bg-slate-950/80 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
-                <span id="landmark-count">Showing 8 locations</span>
+                <span id="landmark-count">Showing locations</span>
                 <button onclick="resetMapView()" class="text-cyan-400 hover:underline flex items-center gap-1">
                     <i class="fa-solid fa-arrows-to-eye"></i> Reset View
                 </button>
             </div>
         </aside>
 
-        <!-- Map Container -->
+        <!-- Map Screen -->
         <main class="flex-1 relative">
             <div id="map"></div>
 
-            <!-- Floating Overlay Dashboard Controls -->
+            <!-- Floating Overlay Dashboard -->
             <div class="absolute top-4 right-4 z-[10] flex flex-col gap-2">
-                <!-- Location Info Card with Close Button -->
-                <div id="info-card" class="bg-slate-900/90 border border-slate-700/70 backdrop-blur-md rounded-xl p-3 shadow-xl max-w-xs text-xs space-y-1 relative group">
+                <div id="info-card" class="bg-slate-900/90 border border-slate-700/70 backdrop-blur-md rounded-xl p-3 shadow-xl max-w-xs text-xs space-y-1 relative">
                     <div class="flex items-center justify-between font-semibold text-cyan-400 pr-5">
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-snowflake"></i> Iqaluit, NU</span>
                         <span class="text-[10px] text-slate-400">63.7467° N, 68.5170° W</span>
@@ -204,9 +185,8 @@
                     </p>
                 </div>
 
-                <!-- Zoom / Recenter Quick Tool -->
                 <div class="bg-slate-900/90 border border-slate-700/70 backdrop-blur-md rounded-xl p-1.5 shadow-xl flex flex-col gap-1 items-center">
-                    <button id="info-toggle-btn" title="Toggle Location Info" onclick="toggleInfoCard()" class="hidden w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                    <button id="info-toggle-btn" title="Toggle Info" onclick="toggleInfoCard()" class="hidden w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
                         <i class="fa-solid fa-info text-xs"></i>
                     </button>
                     <button title="Recenter Map" onclick="resetMapView()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 flex items-center justify-center transition">
@@ -218,62 +198,236 @@
                 </div>
             </div>
 
-            <!-- Interactive Route Active Banner (Hidden by default) -->
+            <!-- Active Tour Banner -->
             <div id="route-banner" class="hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-[10] bg-slate-900/95 border border-cyan-500/50 backdrop-blur-md rounded-2xl px-5 py-3 shadow-2xl flex items-center gap-4 max-w-md w-11/12">
                 <div class="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-700 flex items-center justify-center text-cyan-400 text-lg shrink-0">
                     <i class="fa-solid fa-person-walking"></i>
                 </div>
                 <div class="flex-1 min-w-0">
                     <h4 id="route-title" class="text-xs font-bold text-cyan-300 truncate">Tour Active</h4>
-                    <p id="route-subtitle" class="text-[11px] text-slate-300 truncate">Following custom landmark path</p>
+                    <p id="route-subtitle" class="text-[11px] text-slate-300 truncate">Following path</p>
                 </div>
                 <button onclick="clearTourRoute()" class="text-xs bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 px-2.5 py-1.5 rounded-lg transition">
-                    Clear Tour
+                    Clear
                 </button>
             </div>
         </main>
-
     </div>
 
-    <!-- Guided Tours Modal -->
+    <!-- VIEW & EDIT PLACE MODAL -->
+    <div id="place-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            
+            <!-- Image Header -->
+            <div class="relative h-48 w-full bg-slate-950 border-b border-slate-800 overflow-hidden group">
+                <img id="detail-img" src="" alt="Landmark picture" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-black/40"></div>
+                
+                <button onclick="closeDetailModal()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/80 text-slate-300 hover:text-white flex items-center justify-center backdrop-blur-md border border-slate-700">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
+                    <div>
+                        <span id="detail-category" class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">Media</span>
+                        <h2 id="detail-name" class="text-xl font-bold text-white mt-1 leading-snug">Place Name</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Content & Forms -->
+            <div class="p-5 overflow-y-auto space-y-4 flex-1">
+                
+                <!-- View Mode -->
+                <div id="view-mode-container" class="space-y-4">
+                    <div class="flex items-center gap-2 text-amber-400 text-sm font-semibold">
+                        <span id="detail-rating-stars"></span>
+                        <span id="detail-rating-num" class="text-slate-300 text-xs"></span>
+                    </div>
+
+                    <p id="detail-description" class="text-xs text-slate-300 leading-relaxed"></p>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 text-xs">
+                        <div class="flex items-start gap-2.5 text-slate-300">
+                            <i class="fa-solid fa-location-dot text-rose-400 mt-0.5"></i>
+                            <span id="detail-address"></span>
+                        </div>
+                        <div class="flex items-center gap-2.5 text-slate-300">
+                            <i class="fa-solid fa-phone text-cyan-400"></i>
+                            <span id="detail-phone"></span>
+                        </div>
+                        <div class="flex items-start gap-2.5 text-emerald-400">
+                            <i class="fa-solid fa-clock mt-0.5"></i>
+                            <span id="detail-hours"></span>
+                        </div>
+                        <div class="flex items-center gap-2.5 text-cyan-400">
+                            <i class="fa-solid fa-globe"></i>
+                            <span id="detail-website"></span>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Section -->
+                    <div class="border-t border-slate-800 pt-3">
+                        <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-comments text-cyan-400"></i> Customer Reviews
+                        </h4>
+                        <div id="detail-reviews-container" class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                            <!-- Injected dynamic reviews -->
+                        </div>
+                    </div>
+
+                    <button onclick="enableEditMode()" class="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 font-medium text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Details & Photo
+                    </button>
+                </div>
+
+                <!-- Edit Mode Form -->
+                <form id="edit-form" onsubmit="savePlaceEdits(event)" class="hidden space-y-3">
+                    <input type="hidden" id="edit-place-id">
+                    
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Place Name</label>
+                        <input type="text" id="edit-name" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Image URL</label>
+                        <input type="url" id="edit-img" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Address</label>
+                        <input type="text" id="edit-address" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[11px] font-semibold text-slate-400">Phone</label>
+                            <input type="text" id="edit-phone" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-semibold text-slate-400">Website</label>
+                            <input type="text" id="edit-website" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Opening Hours</label>
+                        <input type="text" id="edit-hours" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Description</label>
+                        <textarea id="edit-description" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100"></textarea>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" onclick="disableEditMode()" class="flex-1 bg-slate-800 text-slate-300 text-xs py-2 rounded-xl">Cancel</button>
+                        <button type="submit" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs py-2 rounded-xl">Save Changes</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD NEW PLACE MODAL -->
+    <div id="add-place-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="font-bold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-plus text-cyan-400"></i> Add New Landmark
+                </h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <form onsubmit="addNewPlace(event)" class="p-4 overflow-y-auto space-y-3">
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Name *</label>
+                    <input type="text" id="add-name" required placeholder="e.g. Iqaluit Bakery" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Category</label>
+                        <select id="add-category" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                            <option value="retail">Retail</option>
+                            <option value="culture">Culture</option>
+                            <option value="media">Media</option>
+                            <option value="hotel">Hotel</option>
+                            <option value="landmark">Landmark</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Rating (1-5)</label>
+                        <input type="number" id="add-rating" min="1" max="5" step="0.1" value="4.5" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Image URL</label>
+                    <input type="url" id="add-img" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Address *</label>
+                    <input type="text" id="add-address" required placeholder="e.g. 102 Ring Rd, Iqaluit, NU" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Phone Number</label>
+                        <input type="text" id="add-phone" placeholder="867-979-0000" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Website URL</label>
+                        <input type="text" id="add-website" placeholder="https://example.ca" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Opening Hours</label>
+                    <input type="text" id="add-hours" placeholder="Monday-Friday, 9am - 5pm" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Initial Review / Notes</label>
+                    <textarea id="add-reviews" rows="2" placeholder="Add customer feedback or description..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Latitude</label>
+                        <input type="number" id="add-lat" step="any" value="63.7467" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Longitude</label>
+                        <input type="number" id="add-lng" step="any" value="-68.5170" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs py-2.5 rounded-xl shadow-lg">Save New Location</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tours Modal -->
     <div id="tours-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div class="p-4 border-b border-slate-800 flex items-center justify-between">
                 <h3 class="font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-route text-cyan-400"></i> Iqaluit Exploration Tours
+                    <i class="fa-solid fa-route text-cyan-400"></i> Guided Exploration Tours
                 </h3>
-                <button onclick="toggleToursModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="toggleToursModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto space-y-4">
-                
-                <!-- Tour 1 -->
-                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 hover:border-cyan-500/50 transition">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h4 class="font-bold text-sm text-cyan-300">Astro Hill & Shopping Hub</h4>
-                            <p class="text-xs text-slate-400 mt-1">Visit Astro Theatre, Frobisher Inn, Northmart, and CBC Nunavut.</p>
-                        </div>
-                        <span class="text-[10px] bg-slate-800 text-cyan-400 px-2 py-0.5 rounded border border-slate-700 shrink-0">~1.5 km</span>
-                    </div>
-                    <button onclick="startTour('town')" class="mt-3 w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs py-2 rounded-lg transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-play text-[10px]"></i> Start Town Walk
-                    </button>
+            <div class="p-4 overflow-y-auto space-y-3">
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+                    <h4 class="font-bold text-sm text-cyan-300">Astro Hill & Shopping Hub</h4>
+                    <p class="text-xs text-slate-400 mt-1">Visit Astro Theatre, Frobisher Inn, Northmart, and CBC Nunavut.</p>
+                    <button onclick="startTour('town')" class="mt-3 w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs py-2 rounded-lg">Start Walk</button>
                 </div>
-
-                <!-- Tour 2 -->
-                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 hover:border-emerald-500/50 transition">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h4 class="font-bold text-sm text-emerald-300">Apex Bay Coastal Excursion</h4>
-                            <p class="text-xs text-slate-400 mt-1">Journey east to Niaqunngut (Apex) along the Frobisher Bay coastline and historic HBC post.</p>
-                        </div>
-                        <span class="text-[10px] bg-slate-800 text-emerald-400 px-2 py-0.5 rounded border border-slate-700 shrink-0">~5.0 km</span>
-                    </div>
-                    <button onclick="startTour('apex')" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-lg transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-play text-[10px]"></i> Start Coastal Trail
-                    </button>
-                </div>
-
             </div>
         </div>
     </div>
@@ -282,8 +436,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
-        // Updated Iqaluit Landmark Data
-        const landmarks = [
+        // Updated Iqaluit Data Set with Photos & Reviews
+        let landmarks = [
             {
                 id: 'astro-theatre',
                 name: 'Astro Theatre',
@@ -292,13 +446,19 @@
                 lat: 63.7490,
                 lng: -68.5195,
                 icon: 'fa-film',
-                color: '#38bdf8', // sky-400
+                color: '#38bdf8',
+                image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80',
                 address: '505 Astro Hl Ter, Iqaluit, NU X0A 0H0',
                 website: 'http://astrotheatre.ca/',
                 phone: '+18679793501',
+                hours: 'Screening times vary daily',
+                rating: 4.6,
                 shortDesc: 'Local movie theatre in Iqaluit located within the Astro Hill Complex.',
                 description: 'The premier cinema venue in Iqaluit screening popular film releases for the local community.',
-                highlights: ['Cinema', 'Astro Hill Complex', 'Entertainment']
+                reviews: [
+                    "Great cozy theatre with classic cinema snacks!",
+                    "Awesome spot to catch late releases right here in Iqaluit."
+                ]
             },
             {
                 id: 'cbc-nunavut',
@@ -308,14 +468,19 @@
                 lat: 63.7478,
                 lng: -68.5169,
                 icon: 'fa-radio',
-                color: '#a855f7', // purple-500
+                color: '#a855f7',
+                image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=600&q=80',
                 address: 'Queen Elizabeth II Wy Building 350, Iqaluit, NU X0A 0H0',
-                website: null,
-                websiteNote: 'No Website added yet',
+                website: 'No Website added yet',
                 phone: '867-979-6135',
+                hours: 'Monday - Friday: 8:30am - 5:00pm',
+                rating: 4.8,
                 shortDesc: 'Public broadcasting station serving Nunavut with local news and stories.',
                 description: 'CBC Nunavut headquarters providing vital local news, radio broadcasting, and territorial coverage.',
-                highlights: ['Broadcasting', 'Local News', 'Building 350']
+                reviews: [
+                    "Essential local news hub for the Arctic territory.",
+                    "Friendly staff and great Inuktitut broadcasts."
+                ]
             },
             {
                 id: 'northmart',
@@ -325,14 +490,19 @@
                 lat: 63.7444,
                 lng: -68.5178,
                 icon: 'fa-cart-shopping',
-                color: '#ec4899', // pink-500
+                color: '#ec4899',
+                image: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=600&q=80',
                 address: '228 Queen Elizabeth II Wy, Iqaluit, NU X0A 1H0',
                 website: 'https://www.northmart.ca/',
                 phone: '+18679753500',
                 hours: 'Monday - Saturday: 9:00am - 9:00pm | Sunday: 10:00am - 7:00pm',
+                rating: 4.2,
                 shortDesc: 'Major department and grocery retail store in downtown Iqaluit.',
                 description: 'Comprehensive department store offering general merchandise, groceries, fresh foods, and essential goods.',
-                highlights: ['Grocery & Goods', 'Central Shopping', 'Daily Services']
+                reviews: [
+                    "Convenient one-stop shop for everything you need.",
+                    "Good bakery section and essential supplies."
+                ]
             },
             {
                 id: 'museum',
@@ -342,14 +512,19 @@
                 lat: 63.7437,
                 lng: -68.5165,
                 icon: 'fa-landmark-museum',
-                color: '#f59e0b', // amber-500
+                color: '#f59e0b',
+                image: 'https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?auto=format&fit=crop&w=600&q=80',
                 address: '212 Sinaa St, Iqaluit, NU X0A 2H0',
                 website: 'https://www.nunattasunakkutaangit.ca/',
                 phone: '+18679795537',
                 hours: 'Monday - Friday: 12:00pm - 6:00pm | Saturday - Sunday: 1:00pm - 5:00pm',
-                shortDesc: 'The only regional museum in Nunavut, preserving traditional Baffin region Inuit culture.',
-                description: 'Preserves traditional Inuit culture with collections of soapstone carvings, skin garments, kayaks, and temporary art exhibits.',
-                highlights: ['Inuit Art', 'Soapstone Carvings', 'Cultural Heritage']
+                rating: 4.9,
+                shortDesc: 'Regional museum preserving Baffin region Inuit culture.',
+                description: 'Preserves traditional Inuit culture with collections of soapstone carvings, skin garments, and kayaks.',
+                reviews: [
+                    "Beautiful collection of Inuit soapstone carvings and historical artifacts.",
+                    "A must-visit cultural center in Iqaluit!"
+                ]
             },
             {
                 id: 'frobisher-inn',
@@ -359,312 +534,272 @@
                 lat: 63.7488,
                 lng: -68.5190,
                 icon: 'fa-hotel',
-                color: '#10b981', // emerald-500
+                color: '#10b981',
+                image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80',
                 address: '505 Astro Hl Ter, Iqaluit, NU X0A 2H0',
                 website: 'http://www.frobisherinn.com/',
                 phone: '+18679792222',
+                hours: 'Open 24/7',
+                rating: 4.4,
                 shortDesc: 'Full-service hotel and conference facility located atop Astro Hill.',
-                description: 'Premier accommodations offering comfortable rooms, dining, conference spaces, and views over Iqaluit and Frobisher Bay.',
-                highlights: ['Hotel', 'Dining & Lounge', 'Astro Hill']
-            },
-            {
-                id: 'road-to-nowhere',
-                name: 'Road to Nowhere',
-                inuktitut: 'ᓇᒧᖓᐅᔭᙱᑦᑐᖅ ᐊᖅᑯᑎ',
-                category: 'landmark',
-                lat: 63.7608,
-                lng: -68.4912,
-                icon: 'fa-road',
-                color: '#06b6d4', // cyan-500
-                address: 'Road to Nowhere, Iqaluit, NU',
-                shortDesc: 'Famous winding dirt road heading out of Iqaluit into open Arctic tundra.',
-                description: 'Winds into tundra hills and terminates in pristine open wilderness. Popular for Aurora viewing.',
-                highlights: ['Aurora Viewing', 'Tundra Walk', 'Scenic Trail']
-            },
-            {
-                id: 'apex-beach',
-                name: 'Apex Beach & HBC Historical Site',
-                inuktitut: 'ᓂᐊᖁ 使っ',
-                category: 'culture',
-                lat: 63.7250,
-                lng: -68.4520,
-                icon: 'fa-water',
-                color: '#3b82f6', // blue-500
-                address: 'Apex District, Iqaluit, NU',
-                shortDesc: 'Historic coastal settlement 5km east with red Hudson\'s Bay buildings.',
-                description: 'Picturesque neighborhood featuring preserved 1950s Hudson\'s Bay Company buildings and beach views.',
-                highlights: ['Historic HBC Buildings', 'Coastal Viewpoint', 'Apex Trail']
+                description: 'Premier accommodations offering comfortable rooms, dining, conference spaces, and views over Iqaluit.',
+                reviews: [
+                    "Great views of Frobisher Bay and comfortable rooms.",
+                    "Excellent dining options inside!"
+                ]
             }
         ];
 
-        const tourRoutes = {
-            town: {
-                title: "Astro Hill & Central Town Walk",
-                subtitle: "Astro Theatre ➔ Frobisher Inn ➔ CBC Nunavut ➔ Northmart",
-                color: "#38bdf8",
-                waypoints: [
-                    [63.7490, -68.5195], // Astro Theatre
-                    [63.7488, -68.5190], // Frobisher Inn
-                    [63.7478, -68.5169], // CBC Nunavut
-                    [63.7444, -68.5178]  // Northmart
-                ]
-            },
-            apex: {
-                title: "Apex Bay Coastal Excursion",
-                subtitle: "Town Center ➔ Coastal Trail ➔ Historic Apex Beach & HBC Site",
-                color: "#10b981",
-                waypoints: [
-                    [63.7444, -68.5178],
-                    [63.7380, -68.4850],
-                    [63.7310, -68.4650],
-                    [63.7250, -68.4520]
-                ]
-            }
-        };
-
-        let map;
-        let activeTileLayer;
+        let map, activeTileLayer, activePolyline;
         let markersGroup = [];
-        let activePolyline = null;
         let currentFilter = 'all';
 
         const tileProviders = {
-            osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors'
-            }),
-            cartoDark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_3mop_1_09d5aeb377057e938b4ee356', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap &copy; CARTO'
-            }),
-            opentopo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                maxZoom: 17,
-                attribution: '&copy; OpenStreetMap contributors, OpenTopoMap'
-            })
+            osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }),
+            cartoDark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }),
+            opentopo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 })
         };
 
         window.onload = function() {
-            map = L.map('map', {
-                center: [63.7467, -68.5170],
-                zoom: 14,
-                zoomControl: false
-            });
-
+            map = L.map('map', { center: [63.7467, -68.5170], zoom: 14, zoomControl: false });
             activeTileLayer = tileProviders.cartoDark;
             activeTileLayer.addTo(map);
-
             L.control.zoom({ position: 'bottomright' }).addTo(map);
             renderLandmarks();
         };
 
         function renderLandmarks() {
-            const sidebarContainer = document.getElementById('landmark-list');
-            sidebarContainer.innerHTML = '';
+            const listEl = document.getElementById('landmark-list');
+            listEl.innerHTML = '';
             
             markersGroup.forEach(m => map.removeLayer(m.marker));
             markersGroup = [];
-
             let count = 0;
 
             landmarks.forEach((item) => {
-                if (currentFilter !== 'all' && item.category !== currentFilter) {
-                    return;
-                }
+                if (currentFilter !== 'all' && item.category !== currentFilter) return;
                 count++;
 
                 const customIcon = L.divIcon({
                     className: 'custom-leaflet-marker',
                     html: `
                         <div class="relative group cursor-pointer">
-                            <div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg border-2 border-slate-900 transition-transform duration-200 group-hover:scale-110 pulse-marker" 
-                                 style="background-color: ${item.color};">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg border-2 border-slate-900 pulse-marker" style="background-color: ${item.color};">
                                 <i class="fa-solid ${item.icon} text-sm"></i>
                             </div>
-                            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45" style="background-color: ${item.color};"></div>
                         </div>
                     `,
-                    iconSize: [36, 36],
-                    iconAnchor: [18, 36],
-                    popupAnchor: [0, -36]
+                    iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -36]
                 });
 
                 const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
-
-                let webLinkHtml = '';
-                if (item.website) {
-                    webLinkHtml = `<a href="${item.website}" target="_blank" rel="noopener" class="text-cyan-400 hover:underline flex items-center gap-1"><i class="fa-solid fa-globe text-[10px]"></i> Website</a>`;
-                } else if (item.websiteNote) {
-                    webLinkHtml = `<span class="text-slate-400 italic text-[11px]"><i class="fa-solid fa-globe-slash text-[10px]"></i> ${item.websiteNote}</span>`;
-                }
-
-                let phoneHtml = item.phone ? `<div class="text-[11px] text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-phone text-cyan-400 text-[10px]"></i> <a href="tel:${item.phone}" class="hover:underline">${item.phone}</a></div>` : '';
-                let hoursHtml = item.hours ? `<div class="text-[11px] text-emerald-400 flex items-start gap-1.5 mt-1"><i class="fa-solid fa-clock text-[10px] mt-0.5"></i> <span>${item.hours}</span></div>` : '';
-
+                
                 const popupContent = `
-                    <div class="space-y-2 max-w-xs">
-                        <div class="flex items-center justify-between border-b border-slate-700/80 pb-1.5">
-                            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700">${item.category}</span>
-                            ${webLinkHtml}
-                        </div>
-                        <h3 class="font-bold text-slate-100 text-sm leading-snug">${item.name}</h3>
-                        ${item.inuktitut ? `<p class="text-xs text-cyan-400 font-medium">${item.inuktitut}</p>` : ''}
-                        <p class="text-xs text-slate-300 leading-relaxed">${item.shortDesc}</p>
-                        <div class="space-y-1 pt-1 border-t border-slate-800">
-                            <div class="text-[11px] text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-rose-400 text-[10px]"></i> ${item.address}</div>
-                            ${phoneHtml}
-                            ${hoursHtml}
-                        </div>
+                    <div class="space-y-2 max-w-xs cursor-pointer" onclick="openPlaceDetail('${item.id}')">
+                        <img src="${item.image}" class="w-full h-24 object-cover rounded-lg border border-slate-700">
+                        <h3 class="font-bold text-cyan-300 text-sm hover:underline">${item.name}</h3>
+                        <p class="text-xs text-slate-300">${item.shortDesc}</p>
+                        <span class="text-[10px] text-cyan-400">Click to view full photo & edit Details →</span>
                     </div>
                 `;
 
                 marker.bindPopup(popupContent);
                 markersGroup.push({ id: item.id, marker: marker, data: item });
 
+                // Sidebar Card Generation
                 const card = document.createElement('div');
                 card.id = `card-${item.id}`;
-                card.className = "bg-slate-950/80 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 rounded-xl p-3.5 transition cursor-pointer group";
-                card.onclick = () => zoomToLandmark(item.id);
-
+                card.className = "bg-slate-950/80 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 rounded-xl p-3 transition cursor-pointer group";
+                
                 card.innerHTML = `
                     <div class="flex items-start gap-3">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow-md" style="background-color: ${item.color}">
-                            <i class="fa-solid ${item.icon} text-sm"></i>
-                        </div>
+                        <img src="${item.image}" class="w-14 h-14 rounded-lg object-cover border border-slate-700 shrink-0">
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-xs font-bold text-slate-100 group-hover:text-cyan-300 transition truncate">${item.name}</h4>
-                            ${item.inuktitut ? `<p class="text-[11px] text-cyan-400 font-medium truncate">${item.inuktitut}</p>` : ''}
-                            <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">${item.shortDesc}</p>
-                            
-                            <div class="mt-2 text-[11px] space-y-0.5 text-slate-300">
-                                <div class="truncate text-slate-400"><i class="fa-solid fa-location-dot text-rose-400 text-[10px]"></i> ${item.address}</div>
-                                ${item.phone ? `<div><i class="fa-solid fa-phone text-cyan-400 text-[10px]"></i> ${item.phone}</div>` : ''}
-                                ${item.hours ? `<div class="text-emerald-400 text-[10px]"><i class="fa-solid fa-clock text-[9px]"></i> ${item.hours}</div>` : ''}
-                                ${item.website ? `<div class="text-cyan-400 text-[10px] truncate"><i class="fa-solid fa-globe text-[9px]"></i> ${item.website}</div>` : ''}
-                                ${item.websiteNote ? `<div class="text-slate-500 italic text-[10px]"><i class="fa-solid fa-globe-slash text-[9px]"></i> ${item.websiteNote}</div>` : ''}
-                            </div>
+                            <!-- NAME CLICK HANDLER: Triggers Detail Modal -->
+                            <h4 onclick="openPlaceDetail('${item.id}'); event.stopPropagation();" class="text-xs font-bold text-cyan-400 hover:text-cyan-200 hover:underline transition truncate">
+                                ${item.name}
+                            </h4>
+                            <p class="text-[11px] text-slate-400 line-clamp-1 mt-0.5">${item.shortDesc}</p>
+                            <div class="text-[10px] text-emerald-400 mt-1 truncate"><i class="fa-solid fa-clock"></i> ${item.hours || 'N/A'}</div>
+                            <div class="text-[10px] text-cyan-300 truncate"><i class="fa-solid fa-globe"></i> ${item.website || 'N/A'}</div>
                         </div>
                     </div>
                 `;
 
-                sidebarContainer.appendChild(card);
+                card.onclick = () => zoomToLandmark(item.id);
+                listEl.appendChild(card);
             });
 
             document.getElementById('landmark-count').innerText = `Showing ${count} location${count === 1 ? '' : 's'}`;
         }
 
+        // Detail View Modal Logic
+        function openPlaceDetail(id) {
+            const place = landmarks.find(p => p.id === id);
+            if (!place) return;
+
+            document.getElementById('edit-place-id').value = place.id;
+            document.getElementById('detail-name').innerText = place.name;
+            document.getElementById('detail-category').innerText = place.category;
+            document.getElementById('detail-img').src = place.image;
+            document.getElementById('detail-description').innerText = place.description || place.shortDesc;
+            document.getElementById('detail-address').innerText = place.address;
+            document.getElementById('detail-phone').innerText = place.phone || 'N/A';
+            document.getElementById('detail-hours').innerText = place.hours || 'N/A';
+            document.getElementById('detail-website').innerText = place.website || 'N/A';
+
+            // Stars Render
+            const stars = '★'.repeat(Math.floor(place.rating || 4)) + '☆'.repeat(5 - Math.floor(place.rating || 4));
+            document.getElementById('detail-rating-stars').innerText = stars;
+            document.getElementById('detail-rating-num').innerText = `(${place.rating || 4.5})`;
+
+            // Reviews List Render
+            const revContainer = document.getElementById('detail-reviews-container');
+            revContainer.innerHTML = '';
+            if (place.reviews && place.reviews.length > 0) {
+                place.reviews.forEach(rev => {
+                    const rDiv = document.createElement('div');
+                    rDiv.className = "bg-slate-950 p-2 rounded-lg border border-slate-800/80 text-[11px] text-slate-300 italic";
+                    rDiv.innerHTML = `<i class="fa-solid fa-quote-left text-cyan-500/50 mr-1"></i> ${rev}`;
+                    revContainer.appendChild(rDiv);
+                });
+            } else {
+                revContainer.innerHTML = `<p class="text-xs text-slate-500">No customer reviews posted yet.</p>`;
+            }
+
+            disableEditMode();
+            document.getElementById('place-detail-modal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('place-detail-modal').classList.add('hidden');
+        }
+
+        function enableEditMode() {
+            const id = document.getElementById('edit-place-id').value;
+            const place = landmarks.find(p => p.id === id);
+            if (!place) return;
+
+            document.getElementById('edit-name').value = place.name;
+            document.getElementById('edit-img').value = place.image;
+            document.getElementById('edit-address').value = place.address;
+            document.getElementById('edit-phone').value = place.phone || '';
+            document.getElementById('edit-website').value = place.website || '';
+            document.getElementById('edit-hours').value = place.hours || '';
+            document.getElementById('edit-description').value = place.description || '';
+
+            document.getElementById('view-mode-container').classList.add('hidden');
+            document.getElementById('edit-form').classList.remove('hidden');
+        }
+
+        function disableEditMode() {
+            document.getElementById('edit-form').classList.add('hidden');
+            document.getElementById('view-mode-container').classList.remove('hidden');
+        }
+
+        function savePlaceEdits(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-place-id').value;
+            const place = landmarks.find(p => p.id === id);
+
+            if (place) {
+                place.name = document.getElementById('edit-name').value;
+                place.image = document.getElementById('edit-img').value;
+                place.address = document.getElementById('edit-address').value;
+                place.phone = document.getElementById('edit-phone').value;
+                place.website = document.getElementById('edit-website').value;
+                place.hours = document.getElementById('edit-hours').value;
+                place.description = document.getElementById('edit-description').value;
+
+                renderLandmarks();
+                openPlaceDetail(id);
+            }
+        }
+
+        // Add New Place Logic
+        function openAddModal() {
+            document.getElementById('add-place-modal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-place-modal').classList.add('hidden');
+        }
+
+        function addNewPlace(e) {
+            e.preventDefault();
+            const newId = 'place-' + Date.now();
+            
+            const newLandmark = {
+                id: newId,
+                name: document.getElementById('add-name').value,
+                category: document.getElementById('add-category').value,
+                lat: parseFloat(document.getElementById('add-lat').value),
+                lng: parseFloat(document.getElementById('add-lng').value),
+                icon: 'fa-location-dot',
+                color: '#06b6d4',
+                image: document.getElementById('add-img').value || 'https://images.unsplash.com/photo-1518005068251-37900150df60?auto=format&fit=crop&w=600&q=80',
+                address: document.getElementById('add-address').value,
+                website: document.getElementById('add-website').value || 'No Website added yet',
+                phone: document.getElementById('add-phone').value || 'N/A',
+                hours: document.getElementById('add-hours').value || 'N/A',
+                rating: parseFloat(document.getElementById('add-rating').value) || 4.5,
+                shortDesc: document.getElementById('add-address').value,
+                description: 'Newly registered Iqaluit location.',
+                reviews: document.getElementById('add-reviews').value ? [document.getElementById('add-reviews').value] : []
+            };
+
+            landmarks.unshift(newLandmark);
+            renderLandmarks();
+            closeAddModal();
+            zoomToLandmark(newId);
+        }
+
+        // Map Interactions
         function zoomToLandmark(id) {
             const found = markersGroup.find(m => m.id === id);
             if (found) {
-                map.flyTo([found.data.lat, found.data.lng], 16, { duration: 1.5 });
+                map.flyTo([found.data.lat, found.data.lng], 16, { duration: 1.2 });
                 found.marker.openPopup();
-
-                document.querySelectorAll('#landmark-list > div').forEach(el => el.classList.remove('ring-2', 'ring-cyan-500'));
-                const card = document.getElementById(`card-${id}`);
-                if (card) {
-                    card.classList.add('ring-2', 'ring-cyan-500');
-                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-
-                if (window.innerWidth < 768) {
-                    document.getElementById('sidebar').classList.add('-translate-x-full');
-                }
             }
         }
 
         function resetMapView() {
-            clearTourRoute();
-            map.flyTo([63.7467, -68.5170], 14, { duration: 1.2 });
+            map.flyTo([63.7467, -68.5170], 14);
         }
 
         function filterLandmarks() {
             const query = document.getElementById('search-input').value.toLowerCase();
-            const cards = document.querySelectorAll('#landmark-list > div');
-
-            cards.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                card.style.display = text.includes(query) ? 'block' : 'none';
+            document.querySelectorAll('#landmark-list > div').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(query) ? 'block' : 'none';
             });
         }
 
         function setCategoryFilter(cat) {
             currentFilter = cat;
-            
-            const pills = document.querySelectorAll('#category-pills button');
-            pills.forEach(btn => {
+            document.querySelectorAll('#category-pills button').forEach(btn => {
                 btn.className = "cat-btn text-xs px-3 py-1 rounded-lg border bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200";
             });
             event.target.className = "cat-btn active text-xs px-3 py-1 rounded-lg border bg-cyan-600 text-white border-cyan-500 font-medium";
-
             renderLandmarks();
         }
 
         function switchTileLayer(layerKey) {
-            if (activeTileLayer) {
-                map.removeLayer(activeTileLayer);
-            }
+            if (activeTileLayer) map.removeLayer(activeTileLayer);
             activeTileLayer = tileProviders[layerKey];
             activeTileLayer.addTo(map);
             toggleLayerMenu();
         }
 
-        function toggleLayerMenu() {
-            document.getElementById('layer-menu').classList.toggle('hidden');
-        }
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-        }
-
-        function toggleToursModal() {
-            document.getElementById('tours-modal').classList.toggle('hidden');
-        }
-
+        function toggleLayerMenu() { document.getElementById('layer-menu').classList.toggle('hidden'); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
+        function toggleToursModal() { document.getElementById('tours-modal').classList.toggle('hidden'); }
         function toggleInfoCard() {
             document.getElementById('info-card').classList.toggle('hidden');
             document.getElementById('info-toggle-btn').classList.toggle('hidden');
         }
-
-        function startTour(tourKey) {
-            toggleToursModal();
-            const tour = tourRoutes[tourKey];
-            if (!tour) return;
-
-            if (activePolyline) {
-                map.removeLayer(activePolyline);
-            }
-
-            activePolyline = L.polyline(tour.waypoints, {
-                color: tour.color,
-                weight: 4,
-                opacity: 0.9,
-                dashArray: '8, 8',
-                lineCap: 'round'
-            }).addTo(map);
-
-            map.fitBounds(activePolyline.getBounds(), { padding: [50, 50] });
-
-            const banner = document.getElementById('route-banner');
-            document.getElementById('route-title').innerText = tour.title;
-            document.getElementById('route-subtitle').innerText = tour.subtitle;
-            banner.classList.remove('hidden');
-        }
-
-        function clearTourRoute() {
-            if (activePolyline) {
-                map.removeLayer(activePolyline);
-                activePolyline = null;
-            }
-            document.getElementById('route-banner').classList.add('hidden');
-        }
-
         function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else if (document.exitFullscreen) document.exitFullscreen();
         }
     </script>
 </body>
