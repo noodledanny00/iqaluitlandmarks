@@ -104,7 +104,11 @@
       padding: 6px 12px;
       border-radius: 6px;
       transition: background 0.2s;
-    }
+    // Free tile layer (No API key required)
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
     .popup-card a:hover {
       background: #0369a1;
     }
