@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Search Console Verification Tag -->
+    <meta name="google-site-verification" content="YZ4j7urjkTDUD1dgqrWZSp2m0YSa3E9QcQ3Exyy09RE" />
     <title>Iqaluit Landmark Explorer - Interactive Map</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -184,7 +186,7 @@
         let currentUser = null;
         let markersGroup = [];
 
-        // Full default list including Astro Theatre, Frobisher Inn, CBC Nunavut, & Northmart
+        // Complete default landmarks list
         const defaultLandmarks = [
             { id: 1, name: "Astro Theatre", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7478, lng: -68.5144 },
             { id: 2, name: "Frobisher Inn", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7475, lng: -68.5141 },
@@ -316,7 +318,7 @@
             });
         }
 
-        // Render immediately on boot
+        // Render immediately
         renderLandmarks();
     </script>
 </body>
