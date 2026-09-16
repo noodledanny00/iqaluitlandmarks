@@ -85,13 +85,13 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <!-- Add Place Button (Triggers Auth if Signed Out) -->
+            <!-- Add Place Button (Requires Microsoft Sign-In) -->
             <button onclick="handleAddPlaceClick()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl border border-cyan-400/30 transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
                 <i class="fa-solid fa-plus text-sm"></i>
                 <span class="hidden sm:inline">Add Place</span>
             </button>
 
-            <!-- Microsoft Auth Profile Button -->
+            <!-- Microsoft Auth Button -->
             <button id="auth-btn" onclick="handleAuthClick()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
                 <i class="fa-brands fa-microsoft text-sky-400 text-sm"></i>
                 <span id="auth-user-label" class="hidden sm:inline">Sign In</span>
@@ -99,11 +99,11 @@
         </div>
     </header>
 
-    <!-- Main Map Workspace (Always Visible) -->
+    <!-- Main Map Workspace -->
     <div class="flex-1 flex relative overflow-hidden">
         <aside id="sidebar" class="w-full md:w-96 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 flex flex-col z-10">
             <div class="p-4 border-b border-slate-800">
-                <input type="text" id="search-input" onkeyup="filterLandmarks()" placeholder="Search landmarks..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200">
+                <input type="text" id="search-input" onkeyup="filterLandmarks()" placeholder="Search landmarks..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
             </div>
             <div class="flex-1 overflow-y-auto p-4 space-y-3" id="landmark-list"></div>
         </aside>
@@ -113,7 +113,7 @@
         </main>
     </div>
 
-    <!-- AUTH REQUIRED MODAL (Only shown when clicking "Add Place" while signed out) -->
+    <!-- AUTH MODAL -->
     <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 relative text-center">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -121,7 +121,7 @@
                 <i class="fa-brands fa-microsoft"></i>
             </div>
             <h3 class="text-lg font-bold text-slate-100">Sign In to Add Places</h3>
-            <p class="text-xs text-slate-400">You can freely explore the map, but you must sign in with Microsoft to post new landmarks.</p>
+            <p class="text-xs text-slate-400">You can explore the map freely, but you must sign in with a Microsoft account to add new landmarks.</p>
             <button onclick="loginWithMicrosoft()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
                 <i class="fa-brands fa-microsoft"></i> Sign In with Microsoft
             </button>
@@ -169,6 +169,7 @@
         </div>
     </div>
 
+    <!-- JS LOGIC -->
     <script>
         const msalConfig = {
             auth: {
@@ -183,7 +184,7 @@
         let currentUser = null;
         let markersGroup = [];
 
-        // Complete Default Landmarks List
+        // Full default list including Astro Theatre, Frobisher Inn, CBC Nunavut, & Northmart
         const defaultLandmarks = [
             { id: 1, name: "Astro Theatre", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7478, lng: -68.5144 },
             { id: 2, name: "Frobisher Inn", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7475, lng: -68.5141 },
@@ -261,7 +262,7 @@
         }
 
         // Initialize Map
-        const map = L.map('map').setView([63.7467, -68.5170], 13);
+        const map = L.map('map').setView([63.7467, -68.5170], 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
         function saveLandmarksToStorage() {
@@ -288,14 +289,14 @@
             const list = document.getElementById('landmark-list');
             list.innerHTML = '';
 
-            // Clear existing markers
+            // Clear old markers
             markersGroup.forEach(marker => map.removeLayer(marker));
             markersGroup = [];
 
             landmarks.forEach(place => {
                 const card = document.createElement('div');
                 card.className = "bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl p-3 text-xs space-y-1 transition cursor-pointer";
-                card.onclick = () => map.flyTo([place.lat, place.lng], 15);
+                card.onclick = () => map.flyTo([place.lat, place.lng], 16);
                 card.innerHTML = `<h4 class="font-bold text-cyan-400">${place.name}</h4><p class="text-slate-400">${place.address}</p>`;
                 list.appendChild(card);
 
@@ -315,7 +316,7 @@
             });
         }
 
-        // Render everything immediately on load
+        // Render immediately on boot
         renderLandmarks();
     </script>
 </body>
