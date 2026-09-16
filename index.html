@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Iqaluit Landmarks Map</title>
+  <title>Iqaluit Landmarks & Movie Spots</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -13,32 +13,107 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
     }
     #map {
       width: 100%;
       height: 100vh;
     }
+    
+    /* Header Overlay */
     .info-header {
       position: absolute;
-      top: 10px;
+      top: 15px;
       left: 50px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 12px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      backdrop-filter: blur(5px);
     }
     .info-header h1 {
       margin: 0;
       font-size: 1.2rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Custom Emoji Pin Styling */
+    .emoji-pin {
+      background: #ffffff;
+      border: 3px solid #0284c7;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 22px;
+      line-height: 38px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .emoji-pin:hover {
+      transform: scale(1.2) translateY(-4px);
+      background: #e0f2fe;
+      border-color: #0369a1;
+    }
+
+    /* Popup Styling */
+    .leaflet-popup-content-wrapper {
+      border-radius: 14px;
+      padding: 5px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .popup-card {
+      font-family: Arial, sans-serif;
+      max-width: 240px;
+    }
+    .popup-card h3 {
+      margin: 0 0 6px 0;
+      font-size: 1.1rem;
+      color: #0f172a;
+    }
+    .popup-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .badge-film { background-color: #fef3c7; color: #92400e; }
+    .badge-landmark { background-color: #dbeafe; color: #1e40af; }
+    .badge-nature { background-color: #dcfce7; color: #166534; }
+    .badge-travel { background-color: #f3e8ff; color: #6b21a8; }
+    
+    .popup-card p {
+      margin: 0 0 10px 0;
+      font-size: 0.88rem;
+      color: #475569;
+      line-height: 1.4;
+    }
+    .popup-card a {
+      display: inline-block;
+      text-decoration: none;
+      background: #0284c7;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .popup-card a:hover {
+      background: #0369a1;
     }
   </style>
 </head>
 <body>
 
   <div class="info-header">
-    <h1>Iqaluit Landmarks & Notable Spots</h1>
+    <h1><span>❄️</span> Iqaluit Landmarks & Movie Spots</h1>
   </div>
 
   <div id="map"></div>
@@ -50,69 +125,107 @@
     // Initialize map centered on Iqaluit
     const map = L.map('map').setView([63.7467, -68.5170], 13);
 
-    // Add OpenStreetMap base tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Dark-themed tile layer (CartoDB Dark Matter)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
+      attribution: '© OpenStreetMap contributors © CARTO'
     }).addTo(map);
 
-    // List of landmarks in Iqaluit with coordinates and descriptions
+    // Landmarks array containing Filming Locations & Local Spots
     const landmarks = [
       {
-        name: "St. Jude's Anglican Cathedral (Igloo Cathedral)",
+        name: "Apex Beach & Historic HBC Store",
+        emoji: "🎬",
+        lat: 63.7258,
+        lng: -68.4552,
+        category: "Movie Location",
+        badgeClass: "badge-film",
+        description: "Featured in Netflix/CBC's <i>North of North</i> (baseball & bonfire scenes) and the movie <i>Two Lovers and a Bear</i>."
+      },
+      {
+        name: "St. Jude's Igloo Cathedral",
+        emoji: "⛪",
         lat: 63.7486,
         lng: -68.5186,
-        category: "Iconic Landmark",
-        description: "The famous igloo-shaped cathedral located in central Iqaluit."
+        category: "Landmark",
+        badgeClass: "badge-landmark",
+        description: "The world-famous igloo-shaped Anglican cathedral right in the center of Iqaluit."
       },
       {
-        name: "Legislative Assembly of Nunavut",
-        lat: 63.7488,
-        lng: -68.5147,
-        category: "Government",
-        description: "Home to Nunavut's government, featuring traditional Inuit architectural elements."
+        name: "Unikkaarvik Visitor Centre",
+        emoji: "🏛️",
+        lat: 63.7456,
+        lng: -68.5135,
+        category: "Movie Location",
+        badgeClass: "badge-film",
+        description: "Doubled as the 'Ice Cove Community Centre' setting in <i>North of North</i>. Houses local heritage exhibits."
       },
       {
-        name: "Iqaluit International Airport (YFB)",
+        name: "Iqaluit Curling Club",
+        emoji: "🥌",
+        lat: 63.7481,
+        lng: -68.5118,
+        category: "Film Studio Spot",
+        badgeClass: "badge-film",
+        description: "Served as the primary makeshift soundstage and filming studio hub for major Northern productions."
+      },
+      {
+        name: "Iqaluit Airport (YFB)",
+        emoji: "✈️",
         lat: 63.7564,
         lng: -68.5558,
         category: "Transportation",
-        description: "Distinct bright yellow terminal building and major northern transit hub."
+        badgeClass: "badge-travel",
+        description: "Iconic yellow Arctic airport building seen in various film arrivals and travel documentaries."
       },
       {
         name: "Sylvia Grinnell Territorial Park",
+        emoji: "🏞️",
         lat: 63.7431,
         lng: -68.5683,
         category: "Nature",
-        description: "Scenic tundra river valley, tundra walking trails, and historic archaeological sites."
+        badgeClass: "badge-nature",
+        description: "Stunning tundra landscapes, waterfalls, and ancient Thule archaeological sites."
       },
       {
-        name: "Apex (Niaqunngut) & Hudson's Bay Company Buildings",
-        lat: 63.7258,
-        lng: -68.4552,
-        category: "History / Film Location",
-        description: "Historic settlement area near Apex Beach with historic red-and-white HBC buildings."
-      },
-      {
-        name: "Astro Hill Complex",
-        lat: 63.7495,
-        lng: -68.5123,
-        category: "Local Spot",
-        description: "Hub featuring residential quarters, shops, and local services."
+        name: "Legislative Assembly of Nunavut",
+        emoji: "🏛️",
+        lat: 63.7488,
+        lng: -68.5147,
+        category: "Landmark",
+        badgeClass: "badge-landmark",
+        description: "Seat of government decorated with traditional Inuit art, seal skin accents, and a mace carved from narwhal tusk."
       }
     ];
 
-    // Add markers for each landmark
+    // Helper to create custom HTML Emoji Markers
+    function createEmojiIcon(emoji) {
+      return L.divIcon({
+        className: 'custom-emoji-marker',
+        html: `<div class="emoji-pin">${emoji}</div>`,
+        iconSize: [42, 42],
+        iconAnchor: [21, 21],
+        popupAnchor: [0, -22]
+      });
+    }
+
+    // Add pins to map
     landmarks.forEach(place => {
-      L.marker([place.lat, place.lng])
-        .addTo(map)
-        .bindPopup(`
-          <div style="max-width: 200px;">
-            <h3 style="margin: 0 0 5px 0;">${place.name}</h3>
-            <span style="font-size: 0.8rem; color: #666; font-weight: bold;">[${place.category}]</span>
-            <p style="margin: 8px 0 0 0; font-size: 0.9rem;">${place.description}</p>
-          </div>
-        `);
+      const marker = L.marker([place.lat, place.lng], {
+        icon: createEmojiIcon(place.emoji)
+      }).addTo(map);
+
+      // Add detailed popup
+      marker.bindPopup(`
+        <div class="popup-card">
+          <h3>${place.emoji} ${place.name}</h3>
+          <span class="popup-badge ${place.badgeClass}">${place.category}</span>
+          <p>${place.description}</p>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}" target="_blank">
+            🗺️ Get Directions
+          </a>
+        </div>
+      `);
     });
   </script>
 </body>
