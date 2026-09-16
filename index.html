@@ -85,8 +85,8 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <!-- Add Place Button (Requires Microsoft Sign-In) -->
-            <button onclick="openAddModal()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl border border-cyan-400/30 transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
+            <!-- Add Place Button (Triggers Auth if Signed Out) -->
+            <button onclick="handleAddPlaceClick()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl border border-cyan-400/30 transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
                 <i class="fa-solid fa-plus text-sm"></i>
                 <span class="hidden sm:inline">Add Place</span>
             </button>
@@ -94,12 +94,12 @@
             <!-- Microsoft Auth Profile Button -->
             <button id="auth-btn" onclick="handleAuthClick()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
                 <i class="fa-brands fa-microsoft text-sky-400 text-sm"></i>
-                <span id="auth-user-label" class="hidden sm:inline">Sign In / Sign Up</span>
+                <span id="auth-user-label" class="hidden sm:inline">Sign In</span>
             </button>
         </div>
     </header>
 
-    <!-- Main Map Workspace -->
+    <!-- Main Map Workspace (Always Visible) -->
     <div class="flex-1 flex relative overflow-hidden">
         <aside id="sidebar" class="w-full md:w-96 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 flex flex-col z-10">
             <div class="p-4 border-b border-slate-800">
@@ -113,17 +113,17 @@
         </main>
     </div>
 
-    <!-- AUTH MODAL -->
+    <!-- AUTH REQUIRED MODAL (Only shown when clicking "Add Place" while signed out) -->
     <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 relative text-center">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             <div class="w-12 h-12 rounded-2xl bg-cyan-950 border border-cyan-700 flex items-center justify-center text-cyan-400 text-xl mx-auto mb-2">
                 <i class="fa-brands fa-microsoft"></i>
             </div>
-            <h3 class="text-lg font-bold text-slate-100">Microsoft Account Required</h3>
-            <p class="text-xs text-slate-400">Sign in with your Microsoft account to add new custom landmarks to the map.</p>
+            <h3 class="text-lg font-bold text-slate-100">Sign In to Add Places</h3>
+            <p class="text-xs text-slate-400">You can freely explore the map, but you must sign in with Microsoft to post new landmarks.</p>
             <button onclick="loginWithMicrosoft()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-                <i class="fa-brands fa-microsoft"></i> Sign In / Sign Up with Microsoft
+                <i class="fa-brands fa-microsoft"></i> Sign In with Microsoft
             </button>
         </div>
     </div>
@@ -141,7 +141,7 @@
                     <input type="text" id="add-name" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
                 </div>
                 <div>
-                    <label class="text-[11px] font-semibold text-slate-400">Upload Image from Computer</label>
+                    <label class="text-[11px] font-semibold text-slate-400">Upload Image</label>
                     <div class="flex gap-2 mt-1">
                         <input type="url" id="add-img" placeholder="https://..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
                         <label class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 text-xs px-3 py-2 rounded-lg cursor-pointer shrink-0">
@@ -169,30 +169,44 @@
         </div>
     </div>
 
-    <!-- JS LOGIC -->
     <script>
-        // MSAL Configuration matching Entra ID
         const msalConfig = {
             auth: {
                 clientId: "a2335a85-a5ec-4061-97f9-4e1807b76793",
                 authority: "https://login.microsoftonline.com/common",
                 redirectUri: "https://noodledanny00.github.io/iqaluitlandmarks/"
             },
-            cache: {
-                cacheLocation: "localStorage"
-            }
+            cache: { cacheLocation: "localStorage" }
         };
 
         const msalInstance = new msal.PublicClientApplication(msalConfig);
         let currentUser = null;
+        let markersGroup = [];
+
+        // Sample Default Landmarks (Always visible)
+        const defaultLandmarks = [
+            { id: 1, name: "Legislative Assembly of Nunavut", address: "926 Unikkaarvik Rd", lat: 63.7495, lng: -68.5162 },
+            { id: 2, name: "Unikkaarvik Visitor Centre", address: "220 Unikkaarvik Rd", lat: 63.7438, lng: -68.5150 },
+            { id: 3, name: "St. Jude's Anglican Cathedral", address: "Mattaaq St", lat: 63.7463, lng: -68.5147 }
+        ];
+
+        let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
 
         msalInstance.initialize().then(() => {
             const accounts = msalInstance.getAllAccounts();
             if (accounts.length > 0) {
                 currentUser = accounts[0];
-                updateUIForUser();
             }
+            updateUIForUser();
         });
+
+        function handleAddPlaceClick() {
+            if (!currentUser) {
+                openAuthModal();
+            } else {
+                openAddModal();
+            }
+        }
 
         function handleAuthClick() {
             if (currentUser) {
@@ -201,7 +215,7 @@
                     updateUIForUser();
                 });
             } else {
-                openAuthModal();
+                loginWithMicrosoft();
             }
         }
 
@@ -211,6 +225,7 @@
                 currentUser = loginResponse.account;
                 updateUIForUser();
                 closeAuthModal();
+                openAddModal();
             } catch (error) {
                 console.error("Microsoft Login Error:", error);
             }
@@ -219,25 +234,17 @@
         function updateUIForUser() {
             const authLabel = document.getElementById('auth-user-label');
             if (currentUser) {
-                authLabel.innerText = currentUser.name || currentUser.username;
+                authLabel.innerText = currentUser.name || "Signed In";
             } else {
-                authLabel.innerText = "Sign In / Sign Up";
+                authLabel.innerText = "Sign In";
             }
         }
 
         function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
         function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
-
-        function openAddModal() {
-            if (!currentUser) {
-                openAuthModal();
-                return;
-            }
-            document.getElementById('add-place-modal').classList.remove('hidden');
-        }
+        function openAddModal() { document.getElementById('add-place-modal').classList.remove('hidden'); }
         function closeAddModal() { document.getElementById('add-place-modal').classList.add('hidden'); }
 
-        // Free File Upload Reader
         function handleFileUpload(event, targetInputId) {
             const file = event.target.files[0];
             if (file) {
@@ -252,8 +259,6 @@
         // Initialize Map
         const map = L.map('map').setView([63.7467, -68.5170], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-
-        let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || [];
 
         function saveLandmarksToStorage() {
             localStorage.setItem('iqaluit_landmarks', JSON.stringify(landmarks));
@@ -278,13 +283,20 @@
         function renderLandmarks() {
             const list = document.getElementById('landmark-list');
             list.innerHTML = '';
+
+            // Clear existing markers
+            markersGroup.forEach(marker => map.removeLayer(marker));
+            markersGroup = [];
+
             landmarks.forEach(place => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs space-y-1";
+                card.className = "bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl p-3 text-xs space-y-1 transition cursor-pointer";
+                card.onclick = () => map.flyTo([place.lat, place.lng], 15);
                 card.innerHTML = `<h4 class="font-bold text-cyan-400">${place.name}</h4><p class="text-slate-400">${place.address}</p>`;
                 list.appendChild(card);
 
-                L.marker([place.lat, place.lng]).addTo(map).bindPopup(`<b>${place.name}</b><br>${place.address}`);
+                const marker = L.marker([place.lat, place.lng]).addTo(map).bindPopup(`<b>${place.name}</b><br>${place.address}`);
+                markersGroup.push(marker);
             });
         }
 
@@ -299,6 +311,7 @@
             });
         }
 
+        // Render everything immediately on load
         renderLandmarks();
     </script>
 </body>
