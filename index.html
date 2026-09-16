@@ -1,244 +1,708 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Iqaluit Landmarks & Movie Spots</title>
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #121212;
-    }
-    #map {
-      width: 100%;
-      height: 100vh;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iqaluit Landmark Explorer - OpenStreetMap</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    /* Header Overlay */
-    .info-header {
-      position: absolute;
-      top: 15px;
-      left: 50px;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 12px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      backdrop-filter: blur(5px);
-    }
-    .info-header h1 {
-      margin: 0;
-      font-size: 1.2rem;
-      color: #1e293b;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Custom Emoji Pin Styling */
-    .emoji-pin {
-      background: #ffffff;
-      border: 3px solid #0284c7;
-      border-radius: 50%;
-      text-align: center;
-      font-size: 22px;
-      line-height: 38px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-    .emoji-pin:hover {
-      transform: scale(1.2) translateY(-4px);
-      background: #e0f2fe;
-      border-color: #0369a1;
-    }
-
-    /* Popup Styling */
-    .leaflet-popup-content-wrapper {
-      border-radius: 14px;
-      padding: 5px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
-    .popup-card {
-      font-family: Arial, sans-serif;
-      max-width: 240px;
-    }
-    .popup-card h3 {
-      margin: 0 0 6px 0;
-      font-size: 1.1rem;
-      color: #0f172a;
-    }
-    .popup-badge {
-      display: inline-block;
-      padding: 3px 8px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      border-radius: 20px;
-      margin-bottom: 8px;
-    }
-    .badge-film { background-color: #fef3c7; color: #92400e; }
-    .badge-landmark { background-color: #dbeafe; color: #1e40af; }
-    .badge-nature { background-color: #dcfce7; color: #166534; }
-    .badge-travel { background-color: #f3e8ff; color: #6b21a8; }
-    
-    .popup-card p {
-      margin: 0 0 10px 0;
-      font-size: 0.88rem;
-      color: #475569;
-      line-height: 1.4;
-    }
-    .popup-card a {
-      display: inline-block;
-      text-decoration: none;
-      background: #0284c7;
-      color: #fff;
-      font-size: 0.8rem;
-      font-weight: bold;
-      padding: 6px 12px;
-     // Initialize map centered on Iqaluit
-const map = L.map('map').setView([63.7467, -68.5170], 13);
-
-// Google Maps Roadmap Layer (Free, no API key required)
-L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-  maxZoom: 20,
-  subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-  attribution: '© Google Maps'
-}).addTo(map);
-      transition: background 0.2s;
-    // Free tile layer (No API key required)
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-    .popup-card a:hover {
-      background: #0369a1;
-    }
-  </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        arctic: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            500: '#0284c7',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            950: '#082f49',
+                        },
+                        tundra: {
+                            500: '#0d9488',
+                            700: '#0f766e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        /* Custom Leaflet popup styling */
+        .leaflet-popup-content-wrapper {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            color: #f8fafc;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+            padding: 4px;
+        }
+        .leaflet-popup-tip {
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        .leaflet-popup-content {
+            margin: 12px 14px;
+            line-height: 1.5;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.4);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.7);
+        }
+        /* Pulsing map pin marker effect */
+        .pulse-marker {
+            box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7);
+            animation: pulse-ring 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+        @keyframes pulse-ring {
+            to {
+                box-shadow: 0 0 0 16px rgba(56, 189, 248, 0);
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 h-full flex flex-col overflow-hidden select-none">
 
-  <div class="info-header">
-    <h1><span>❄️</span> Iqaluit Landmarks & Movie Spots</h1>
-  </div>
-
-  <div id="map"></div>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  
-  <script>
-    // Initialize map centered on Iqaluit
-    const map = L.map('map').setView([63.7467, -68.5170], 13);
-
-    // Dark-themed tile layer (CartoDB Dark Matter)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors © CARTO'
-    }).addTo(map);
-
-    // Landmarks array containing Filming Locations & Local Spots
-    const landmarks = [
-      {
-        name: "Apex Beach & Historic HBC Store",
-        emoji: "🎬",
-        lat: 63.7258,
-        lng: -68.4552,
-        category: "Movie Location",
-        badgeClass: "badge-film",
-        description: "Featured in Netflix/CBC's <i>North of North</i> (baseball & bonfire scenes) and the movie <i>Two Lovers and a Bear</i>."
-      },
-      {
-        name: "St. Jude's Igloo Cathedral",
-        emoji: "⛪",
-        lat: 63.7486,
-        lng: -68.5186,
-        category: "Landmark",
-        badgeClass: "badge-landmark",
-        description: "The world-famous igloo-shaped Anglican cathedral right in the center of Iqaluit."
-      },
-      {
-        name: "Unikkaarvik Visitor Centre",
-        emoji: "🏛️",
-        lat: 63.7456,
-        lng: -68.5135,
-        category: "Movie Location",
-        badgeClass: "badge-film",
-        description: "Doubled as the 'Ice Cove Community Centre' setting in <i>North of North</i>. Houses local heritage exhibits."
-      },
-      {
-        name: "Iqaluit Curling Club",
-        emoji: "🥌",
-        lat: 63.7481,
-        lng: -68.5118,
-        category: "Film Studio Spot",
-        badgeClass: "badge-film",
-        description: "Served as the primary makeshift soundstage and filming studio hub for major Northern productions."
-      },
-      {
-        name: "Iqaluit Airport (YFB)",
-        emoji: "✈️",
-        lat: 63.7564,
-        lng: -68.5558,
-        category: "Transportation",
-        badgeClass: "badge-travel",
-        description: "Iconic yellow Arctic airport building seen in various film arrivals and travel documentaries."
-      },
-      {
-        name: "Sylvia Grinnell Territorial Park",
-        emoji: "🏞️",
-        lat: 63.7431,
-        lng: -68.5683,
-        category: "Nature",
-        badgeClass: "badge-nature",
-        description: "Stunning tundra landscapes, waterfalls, and ancient Thule archaeological sites."
-      },
-      {
-        name: "Legislative Assembly of Nunavut",
-        emoji: "🏛️",
-        lat: 63.7488,
-        lng: -68.5147,
-        category: "Landmark",
-        badgeClass: "badge-landmark",
-        description: "Seat of government decorated with traditional Inuit art, seal skin accents, and a mace carved from narwhal tusk."
-      }
-    ];
-
-    // Helper to create custom HTML Emoji Markers
-    function createEmojiIcon(emoji) {
-      return L.divIcon({
-        className: 'custom-emoji-marker',
-        html: `<div class="emoji-pin">${emoji}</div>`,
-        iconSize: [42, 42],
-        iconAnchor: [21, 21],
-        popupAnchor: [0, -22]
-      });
-    }
-
-    // Add pins to map
-    landmarks.forEach(place => {
-      const marker = L.marker([place.lat, place.lng], {
-        icon: createEmojiIcon(place.emoji)
-      }).addTo(map);
-
-      // Add detailed popup
-      marker.bindPopup(`
-        <div class="popup-card">
-          <h3>${place.emoji} ${place.name}</h3>
-          <span class="popup-badge ${place.badgeClass}">${place.category}</span>
-          <p>${place.description}</p>
-          <a href="https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}" target="_blank">
-            🗺️ Get Directions
-          </a>
+    <!-- Top Header Navigation -->
+    <header class="h-16 bg-slate-900/90 border-b border-slate-800 backdrop-blur-md px-4 flex items-center justify-between z-20 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-sky-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-compass text-slate-950 text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg text-slate-100 leading-tight flex items-center gap-2">
+                    Iqaluit Landmark Explorer
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/50">ᐃᖃᓗᐃᑦ</span>
+                </h1>
+                <p class="text-xs text-slate-400 flex items-center gap-2">
+                    <span><i class="fa-solid fa-map-pin text-cyan-400 text-[10px]"></i> Nunavut, Canada</span>
+                    <span>•</span>
+                    <span>Powered by OpenStreetMap</span>
+                </p>
+            </div>
         </div>
-      `);
-    });
-  </script>
+
+        <div class="flex items-center gap-2">
+            <!-- Tour Mode Trigger -->
+            <button id="tours-btn" onclick="toggleToursModal()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-route text-cyan-400"></i>
+                <span class="hidden sm:inline">Guided Tours</span>
+            </button>
+
+            <!-- Layer Switcher Dropdown Button -->
+            <div class="relative">
+                <button id="map-layers-btn" onclick="toggleLayerMenu()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-slate-400"></i>
+                    <span class="hidden sm:inline">Map Style</span>
+                </button>
+                <div id="layer-menu" class="hidden absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-2 z-30">
+                    <div class="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400">Select Tile Layer</div>
+                    <button onclick="switchTileLayer('osm')" class="w-full text-left px-3 py-2 text-xs hover:bg-slate-800 flex items-center gap-2 text-slate-200">
+                        <i class="fa-solid fa-map text-emerald-400"></i> OpenStreetMap Standard
+                    </button>
+                    <button onclick="switchTileLayer('cartoDark')" class="w-full text-left px-3 py-2 text-xs hover:bg-slate-800 flex items-center gap-2 text-slate-200">
+                        <i class="fa-solid fa-moon text-indigo-400"></i> CartoDB Dark Matter
+                    </button>
+                    <button onclick="switchTileLayer('opentopo')" class="w-full text-left px-3 py-2 text-xs hover:bg-slate-800 flex items-center gap-2 text-slate-200">
+                        <i class="fa-solid fa-mountain text-amber-400"></i> OpenTopoMap
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button onclick="toggleSidebar()" class="md:hidden bg-slate-800 hover:bg-slate-700 text-slate-200 p-2.5 rounded-xl border border-slate-700">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex relative overflow-hidden">
+        
+        <!-- Sidebar Panel -->
+        <aside id="sidebar" class="w-full md:w-96 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 flex flex-col z-10 transition-all duration-300 absolute md:relative inset-y-0 left-0 -translate-x-full md:translate-x-0">
+            <!-- Search & Filters -->
+            <div class="p-4 border-b border-slate-800 space-y-3">
+                <!-- Search Box -->
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                    <input type="text" id="search-input" onkeyup="filterLandmarks()" placeholder="Search landmarks, culture, trails..." 
+                           class="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex flex-wrap gap-1.5" id="category-pills">
+                    <button onclick="setCategoryFilter('all')" class="cat-btn active text-xs px-3 py-1 rounded-lg border bg-cyan-600 text-white border-cyan-500 font-medium">All</button>
+                    <button onclick="setCategoryFilter('culture')" class="cat-btn text-xs px-3 py-1 rounded-lg border bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200">Culture</button>
+                    <button onclick="setCategoryFilter('nature')" class="cat-btn text-xs px-3 py-1 rounded-lg border bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200">Nature</button>
+                    <button onclick="setCategoryFilter('government')" class="cat-btn text-xs px-3 py-1 rounded-lg border bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200">Government</button>
+                    <button onclick="setCategoryFilter('landmark')" class="cat-btn text-xs px-3 py-1 rounded-lg border bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200">Civic</button>
+                </div>
+            </div>
+
+            <!-- Landmark List Container -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-3" id="landmark-list">
+                <!-- Dynamic Content Injected Here -->
+            </div>
+
+            <!-- Footer Stats & Info -->
+            <div class="p-3 bg-slate-950/80 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+                <span id="landmark-count">Showing 8 landmarks</span>
+                <button onclick="resetMapView()" class="text-cyan-400 hover:underline flex items-center gap-1">
+                    <i class="fa-solid fa-arrows-to-eye"></i> Reset View
+                </button>
+            </div>
+        </aside>
+
+        <!-- Map Container -->
+        <main class="flex-1 relative">
+            <div id="map"></div>
+
+            <!-- Floating Overlay Dashboard Controls -->
+            <div class="absolute top-4 right-4 z-[10] flex flex-col gap-2">
+                <!-- Location Info Card -->
+                <div class="bg-slate-900/90 border border-slate-700/70 backdrop-blur-md rounded-xl p-3 shadow-xl max-w-xs text-xs space-y-1">
+                    <div class="flex items-center justify-between font-semibold text-cyan-400">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-snowflake"></i> Iqaluit, NU</span>
+                        <span class="text-[10px] text-slate-400">63.7467° N, 68.5170° W</span>
+                    </div>
+                    <p class="text-slate-300 text-[11px] leading-tight">
+                        Capital city of Nunavut located on Frobisher Bay on Baffin Island.
+                    </p>
+                </div>
+
+                <!-- Zoom / Recenter Quick Tool -->
+                <div class="bg-slate-900/90 border border-slate-700/70 backdrop-blur-md rounded-xl p-1.5 shadow-xl flex flex-col gap-1 items-center">
+                    <button title="Recenter Map" onclick="resetMapView()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 flex items-center justify-center transition">
+                        <i class="fa-solid fa-location-crosshairs text-sm"></i>
+                    </button>
+                    <button title="Toggle Fullscreen" onclick="toggleFullscreen()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                        <i class="fa-solid fa-expand text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Route Active Banner (Hidden by default) -->
+            <div id="route-banner" class="hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-[10] bg-slate-900/95 border border-cyan-500/50 backdrop-blur-md rounded-2xl px-5 py-3 shadow-2xl flex items-center gap-4 max-w-md w-11/12">
+                <div class="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-700 flex items-center justify-center text-cyan-400 text-lg shrink-0">
+                    <i class="fa-solid fa-person-walking"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 id="route-title" class="text-xs font-bold text-cyan-300 truncate">Tour Active</h4>
+                    <p id="route-subtitle" class="text-[11px] text-slate-300 truncate">Following custom landmark path</p>
+                </div>
+                <button onclick="clearTourRoute()" class="text-xs bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 px-2.5 py-1.5 rounded-lg transition">
+                    Clear Tour
+                </button>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Guided Tours Modal -->
+    <div id="tours-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="font-bold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-route text-cyan-400"></i> Iqaluit Exploration Tours
+                </h3>
+                <button onclick="toggleToursModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-4">
+                
+                <!-- Tour 1 -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 hover:border-cyan-500/50 transition">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm text-cyan-300">Downtown Cultural & Heritage Trail</h4>
+                            <p class="text-xs text-slate-400 mt-1">Visit the Visitor Centre, Sunakkutaangit Museum, Igloo Cathedral, and Legislative Assembly.</p>
+                        </div>
+                        <span class="text-[10px] bg-slate-800 text-cyan-400 px-2 py-0.5 rounded border border-slate-700 shrink-0">~2.2 km</span>
+                    </div>
+                    <button onclick="startTour('cultural')" class="mt-3 w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs py-2 rounded-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-[10px]"></i> Start Heritage Walk
+                    </button>
+                </div>
+
+                <!-- Tour 2 -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 hover:border-emerald-500/50 transition">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm text-emerald-300">Apex Bay Coastal Excursion</h4>
+                            <p class="text-xs text-slate-400 mt-1">Journey east to Niaqunngut (Apex) along the Frobisher Bay coastline and historic HBC post.</p>
+                        </div>
+                        <span class="text-[10px] bg-slate-800 text-emerald-400 px-2 py-0.5 rounded border border-slate-700 shrink-0">~5.0 km</span>
+                    </div>
+                    <button onclick="startTour('apex')" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2 rounded-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-[10px]"></i> Start Coastal Trail
+                    </button>
+                </div>
+
+                <!-- Tour 3 -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 hover:border-amber-500/50 transition">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm text-amber-300">Tundra Wilderness & Skyline Route</h4>
+                            <p class="text-xs text-slate-400 mt-1">Explore Sylvia Grinnell Territorial Park to the west and the iconic Road to Nowhere to the north.</p>
+                        </div>
+                        <span class="text-[10px] bg-slate-800 text-amber-400 px-2 py-0.5 rounded border border-slate-700 shrink-0">~8.5 km</span>
+                    </div>
+                    <button onclick="startTour('tundra')" class="mt-3 w-full bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs py-2 rounded-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-[10px]"></i> Start Wilderness Route
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        // Iqaluit Landmark Data
+        const landmarks = [
+            {
+                id: 'leg-assembly',
+                name: 'Legislative Assembly of Nunavut',
+                inuktitut: 'ᓄᓇᕗᒻᒥ ᒪᓕᒐᐅᕐᕕᒃ',
+                category: 'government',
+                lat: 63.7503,
+                lng: -68.5147,
+                icon: 'fa-building-columns',
+                color: '#38bdf8', // sky-400
+                address: '926 Federal Rd, Iqaluit, NU X0A 0A1',
+                shortDesc: 'The government center of Nunavut, showcasing authentic Inuit art and a famous Narwhal tusk mace.',
+                description: 'The Legislative Building of Nunavut houses the 22-member territorial assembly. Opened in 1999, the glass and wooden architecture incorporates indigenous Arctic motifs, sealskin woven furnishings, and a ceremonial mace crafted from narwhal tusk and local gemstone copper.',
+                highlights: ['Narwhal Tusk Mace', 'Inuit Tapestry Art', 'Public Gallery Tours']
+            },
+            {
+                id: 'st-judes',
+                name: "St. Jude's Anglican Cathedral",
+                inuktitut: 'ᑐᒃᓯᐊᕐᕕᒃ',
+                category: 'culture',
+                lat: 63.7478,
+                lng: -68.5169,
+                icon: 'fa-church',
+                color: '#a855f7', // purple-500
+                address: '657 Pitsi Ln, Iqaluit, NU X0A 3H0',
+                shortDesc: 'Iconic Igloo-shaped cathedral serving as the seat of the Anglican Diocese of the Arctic.',
+                description: 'Widely known as the "Igloo Church" for its distinctive white hemispherical roof. Originally built in 1970 and faithfully rebuilt in 2012 after a fire, the cathedral features woven wool altarpieces, cross carved from narwhal tusks, and traditional sealskin decorations.',
+                highlights: ['Igloo Architecture', 'Diocese Seat', 'Narwhal Cross']
+            },
+            {
+                id: 'visitor-centre',
+                name: 'Unikkaarvik Visitor Centre',
+                inuktitut: 'ᐳᓚᕋᖅᑐᓄᑦ ᑐᑭᓯᒋᐊᕐᕕᒃ',
+                category: 'culture',
+                lat: 63.7444,
+                lng: -68.5178,
+                icon: 'fa-circle-info',
+                color: '#ec4899', // pink-500
+                address: '220 Sinaa St, Iqaluit, NU X0A 0H0',
+                shortDesc: 'Cultural gateway featuring taxidermy Arctic wildlife, Inuit tools, and regional travel guides.',
+                description: 'Located right on Koojesse Inlet, Unikkaarvik provides comprehensive tourist resources, life-sized polar bear and seal exhibits, traditional Inuit tool displays, audio recordings of Arctic folklore, and local art exhibitions.',
+                highlights: ['Life-size Polar Bear Exhibit', 'Inuit Tool Collection', 'Tourist Information']
+            },
+            {
+                id: 'museum',
+                name: 'Nunatta Sunakkutaangit Museum',
+                inuktitut: 'ᓄᓇᑦᑕ ᓱᓇᒃᑯᑖᖏᑦ ᑕᑯᔭᒐᖃᕐᕕᒃ',
+                category: 'culture',
+                lat: 63.7437,
+                lng: -68.5165,
+                icon: 'fa-landmark-museum',
+                color: '#f59e0b', // amber-500
+                address: '212 Sinaa St, Iqaluit, NU X0A 2H0',
+                shortDesc: 'The only regional museum in Nunavut, housed in a historical Hudson\'s Bay Company building.',
+                description: 'Housed in an elongated red-roofed former Hudson\'s Bay Company store, this museum preserves traditional Baffin region Inuit culture. Features collections of soapstone carvings, skin garments, kayaks, prints, and rotating temporary contemporary art exhibits.',
+                highlights: ['Historic HBC Building', 'Soapstone Sculptures', 'Traditional Kayak Displays']
+            },
+            {
+                id: 'sylvia-grinnell',
+                name: 'Sylvia Grinnell Territorial Park',
+                inuktitut: 'ᐃᖃᓗᐃᑦ ᑲᓐᑕᖏ',
+                category: 'nature',
+                lat: 63.7455,
+                lng: -68.5630,
+                icon: 'fa-tree',
+                color: '#10b981', // emerald-500
+                address: 'Sylvia Grinnell Park Rd, Iqaluit, NU',
+                shortDesc: 'Expansive Arctic park along the Sylvia Grinnell River with waterfalls, Thule sites, and tundra trails.',
+                description: 'Just 10 minutes west of downtown, this park offers panoramic tundra landscapes, roaring waterfalls, caribou and Arctic fox sightings, and ancient Thule archaeological stone structures dating back over 1,000 years.',
+                highlights: ['Tundra Falls', 'Thule Archaeological Sites', 'Caribou Viewing']
+            },
+            {
+                id: 'road-to-nowhere',
+                name: 'Road to Nowhere',
+                inuktitut: 'ᓇᒧᖓᐅᔭᙱᑦᑐᖅ ᐊᖅᑯᑎ',
+                category: 'landmark',
+                lat: 63.7608,
+                lng: -68.4912,
+                icon: 'fa-road',
+                color: '#06b6d4', // cyan-500
+                address: 'Road to Nowhere, Iqaluit, NU',
+                shortDesc: 'Famous winding dirt road heading out of Iqaluit into the open Arctic tundra terrain.',
+                description: 'One of Iqaluit\'s most famous curious landmarks. The road starts near the town center and winds up into the tundra hills, abruptly terminating in pristine open wilderness. It is a favorite spot for hiking, Aurora Borealis viewing, and stargazing.',
+                highlights: ['Aurora Borealis Viewing', 'Tundra Hiking', 'Iconic Road Sign']
+            },
+            {
+                id: 'apex-beach',
+                name: 'Apex Beach & HBC Historical Site (Niaqunngut)',
+                inuktitut: 'ᓂᐊᖁ 使っ',
+                category: 'culture',
+                lat: 63.7250,
+                lng: -68.4520,
+                icon: 'fa-water',
+                color: '#3b82f6', // blue-500
+                address: 'Apex District, Iqaluit, NU',
+                shortDesc: 'Historic coastal settlement 5km east with red Hudson\'s Bay buildings and tidal beach.',
+                description: 'Apex (Niaqunngut) is a quiet, picturesque neighborhood 5 kilometers east of downtown Iqaluit. It features preserved 1950s Hudson\'s Bay Company wooden buildings, sandy Baffin shorelines, and stunning elevated viewpoints across Frobisher Bay.',
+                highlights: ['Historic HBC Buildings', 'Frobisher Bay Viewpoint', 'Arctic Beach Walks']
+            },
+            {
+                id: 'astro-hill',
+                name: 'Astro Hill Complex & Weather Dome',
+                inuktitut: 'ᐊストᕉ ᕼᐃᓪ',
+                category: 'landmark',
+                lat: 63.7490,
+                lng: -68.5195,
+                icon: 'fa-building',
+                color: '#8b5cf6', // violet-500
+                address: 'Astro Hill, Iqaluit, NU',
+                shortDesc: 'Famous indoor town complex housing apartments, hotel, cinema, and shops under one roof.',
+                description: 'Designed to allow residents to shop, dine, and live without braving extreme -40°C winter temperatures. Astro Hill features the 8-storey high-rise tower, indoor concourse, movie theatre, and hotel looking over Koojesse Inlet.',
+                highlights: ['All-Weather Indoor Complex', 'Astro Theatre', 'Panoramic Hill View']
+            }
+        ];
+
+        const tourRoutes = {
+            cultural: {
+                title: "Downtown Cultural & Heritage Walk",
+                subtitle: "Visitor Centre ➔ Museum ➔ Igloo Cathedral ➔ Legislative Assembly",
+                color: "#ec4899",
+                waypoints: [
+                    [63.7444, -68.5178], // Visitor Centre
+                    [63.7437, -68.5165], // Museum
+                    [63.7478, -68.5169], // St Judes
+                    [63.7503, -68.5147]  // Legislative Assembly
+                ]
+            },
+            apex: {
+                title: "Apex Bay Coastal Excursion",
+                subtitle: "Town Center ➔ Coastal Trail ➔ Historic Apex Beach & HBC Site",
+                color: "#10b981",
+                waypoints: [
+                    [63.7444, -68.5178],
+                    [63.7380, -68.4850],
+                    [63.7310, -68.4650],
+                    [63.7250, -68.4520]  // Apex
+                ]
+            },
+            tundra: {
+                title: "Tundra Wilderness & Skyline Route",
+                subtitle: "Sylvia Grinnell Park ➔ Astro Hill ➔ Road to Nowhere",
+                color: "#f59e0b",
+                waypoints: [
+                    [63.7455, -68.5630], // Sylvia Grinnell
+                    [63.7490, -68.5195], // Astro Hill
+                    [63.7608, -68.4912]  // Road to Nowhere
+                ]
+            }
+        };
+
+        // State variables
+        let map;
+        let activeTileLayer;
+        let markersGroup = [];
+        let activePolyline = null;
+        let currentFilter = 'all';
+
+        // Tile layer definitions using standard OpenStreetMap and satellite/topo providers
+        const tileProviders = {
+            osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }),
+            cartoDark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+            }),
+            opentopo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                maxZoom: 17,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, OpenTopoMap'
+            })
+        };
+
+        window.onload = function() {
+            // Initialize map centered on Iqaluit center [63.7467, -68.5170]
+            map = L.map('map', {
+                center: [63.7467, -68.5170],
+                zoom: 13,
+                zoomControl: false
+            });
+
+            // Set default tile layer to CartoDB Dark Matter for sleek arctic feel
+            activeTileLayer = tileProviders.cartoDark;
+            activeTileLayer.addTo(map);
+
+            // Add custom positioning zoom control
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            // Render landmark pins and sidebar cards
+            renderLandmarks();
+        };
+
+        function renderLandmarks() {
+            const sidebarContainer = document.getElementById('landmark-list');
+            sidebarContainer.innerHTML = '';
+            
+            // Clear existing map markers
+            markersGroup.forEach(m => map.removeLayer(m.marker));
+            markersGroup = [];
+
+            let count = 0;
+
+            landmarks.forEach((item) => {
+                if (currentFilter !== 'all' && item.category !== currentFilter) {
+                    return;
+                }
+                count++;
+
+                // 1. Create Custom SVG / FontAwesome Marker Icon for Leaflet
+                const customIcon = L.divIcon({
+                    className: 'custom-leaflet-marker',
+                    html: `
+                        <div class="relative group cursor-pointer">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg border-2 border-slate-900 transition-transform duration-200 group-hover:scale-110 pulse-marker" 
+                                 style="background-color: ${item.color};">
+                                <i class="fa-solid ${item.icon} text-sm"></i>
+                            </div>
+                            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45" style="background-color: ${item.color};"></div>
+                        </div>
+                    `,
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 36],
+                    popupAnchor: [0, -36]
+                });
+
+                // 2. Instantiate Leaflet Marker
+                const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
+
+                // 3. Create Rich Popup Content
+                const popupContent = `
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between border-b border-slate-700/80 pb-2">
+                            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700">${item.category}</span>
+                            <span class="text-[10px] text-slate-400 font-mono">${item.lat.toFixed(4)}°N, ${Math.abs(item.lng).toFixed(4)}°W</span>
+                        </div>
+                        <h3 class="font-bold text-slate-100 text-sm leading-snug">${item.name}</h3>
+                        <p class="text-xs text-cyan-400 font-medium">${item.inuktitut}</p>
+                        <p class="text-xs text-slate-300 leading-relaxed">${item.shortDesc}</p>
+                        <div class="pt-2 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400"><i class="fa-solid fa-location-dot text-rose-400"></i> ${item.address.split(',')[0]}</span>
+                            <button onclick="zoomToLandmark('${item.id}')" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1">
+                                Fly Here <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+                markersGroup.push({ id: item.id, marker: marker, data: item });
+
+                // 4. Create Sidebar Item Element
+                const card = document.createElement('div');
+                card.id = `card-${item.id}`;
+                card.className = "bg-slate-950/80 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 rounded-xl p-3.5 transition cursor-pointer group";
+                card.onclick = () => zoomToLandmark(item.id);
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow-md" style="background-color: ${item.color}">
+                            <i class="fa-solid ${item.icon} text-sm"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-1">
+                                <h4 class="text-xs font-bold text-slate-100 group-hover:text-cyan-300 transition truncate">${item.name}</h4>
+                            </div>
+                            <p class="text-[11px] text-cyan-400 font-medium truncate">${item.inuktitut}</p>
+                            <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">${item.shortDesc}</p>
+                            
+                            <div class="mt-2.5 flex flex-wrap gap-1">
+                                ${item.highlights.map(h => `<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-slate-800">${h}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                sidebarContainer.appendChild(card);
+            });
+
+            document.getElementById('landmark-count').innerText = `Showing ${count} landmark${count === 1 ? '' : 's'}`;
+        }
+
+        function zoomToLandmark(id) {
+            const found = markersGroup.find(m => m.id === id);
+            if (found) {
+                map.flyTo([found.data.lat, found.data.lng], 16, {
+                    duration: 1.5
+                });
+                found.marker.openPopup();
+
+                // Highlight card in sidebar
+                document.querySelectorAll('#landmark-list > div').forEach(el => el.classList.remove('ring-2', 'ring-cyan-500'));
+                const card = document.getElementById(`card-${id}`);
+                if (card) {
+                    card.classList.add('ring-2', 'ring-cyan-500');
+                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+
+                // Close sidebar on mobile
+                if (window.innerWidth < 768) {
+                    document.getElementById('sidebar').classList.add('-translate-x-full');
+                }
+            }
+        }
+
+        function resetMapView() {
+            clearTourRoute();
+            map.flyTo([63.7467, -68.5170], 13, { duration: 1.2 });
+        }
+
+        function filterLandmarks() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('#landmark-list > div');
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function setCategoryFilter(cat) {
+            currentFilter = cat;
+            
+            // Update UI buttons
+            const pills = document.querySelectorAll('#category-pills button');
+            pills.forEach(btn => {
+                btn.className = "cat-btn text-xs px-3 py-1 rounded-lg border bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200";
+            });
+            event.target.className = "cat-btn active text-xs px-3 py-1 rounded-lg border bg-cyan-600 text-white border-cyan-500 font-medium";
+
+            renderLandmarks();
+        }
+
+        // Switch tile layers (OpenStreetMap, CartoDB, OpenTopoMap)
+        function switchTileLayer(layerKey) {
+            if (activeTileLayer) {
+                map.removeLayer(activeTileLayer);
+            }
+            activeTileLayer = tileProviders[layerKey];
+            activeTileLayer.addTo(map);
+            toggleLayerMenu();
+        }
+
+        function toggleLayerMenu() {
+            const menu = document.getElementById('layer-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        function toggleToursModal() {
+            const modal = document.getElementById('tours-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function startTour(tourKey) {
+            toggleToursModal();
+            const tour = tourRoutes[tourKey];
+            if (!tour) return;
+
+            // Remove existing tour polyline
+            if (activePolyline) {
+                map.removeLayer(activePolyline);
+            }
+
+            // Draw polyline route on OpenStreetMap Leaflet layer
+            activePolyline = L.polyline(tour.waypoints, {
+                color: tour.color,
+                weight: 4,
+                opacity: 0.9,
+                dashArray: '8, 8',
+                lineCap: 'round'
+            }).addTo(map);
+
+            // Fit map bounds to show entire tour
+            map.fitBounds(activePolyline.getBounds(), { padding: [50, 50] });
+
+            // Show active tour banner
+            const banner = document.getElementById('route-banner');
+            document.getElementById('route-title').innerText = tour.title;
+            document.getElementById('route-subtitle').innerText = tour.subtitle;
+            banner.classList.remove('hidden');
+        }
+
+        function clearTourRoute() {
+            if (activePolyline) {
+                map.removeLayer(activePolyline);
+                activePolyline = null;
+            }
+            document.getElementById('route-banner').classList.add('hidden');
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
 </body>
 </html>
