@@ -171,12 +171,12 @@
 
     <!-- JS LOGIC -->
     <script>
-        // 1. MSAL Configuration with your exact Client ID
+        // MSAL Configuration matching Entra ID
         const msalConfig = {
             auth: {
                 clientId: "a2335a85-a5ec-4061-97f9-4e1807b76793",
                 authority: "https://login.microsoftonline.com/common",
-                redirectUri: window.location.href.split('?')[0].split('#')[0]
+                redirectUri: "https://noodledanny00.github.io/iqaluitlandmarks/"
             },
             cache: {
                 cacheLocation: "localStorage"
@@ -285,6 +285,17 @@
                 list.appendChild(card);
 
                 L.marker([place.lat, place.lng]).addTo(map).bindPopup(`<b>${place.name}</b><br>${place.address}`);
+            });
+        }
+
+        function filterLandmarks() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.getElementById('landmark-list').children;
+            landmarks.forEach((place, index) => {
+                const matches = place.name.toLowerCase().includes(query) || place.address.toLowerCase().includes(query);
+                if (cards[index]) {
+                    cards[index].style.display = matches ? 'block' : 'none';
+                }
             });
         }
 
