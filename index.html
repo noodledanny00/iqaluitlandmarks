@@ -183,11 +183,15 @@
         let currentUser = null;
         let markersGroup = [];
 
-        // Sample Default Landmarks (Always visible)
+        // Complete Default Landmarks List
         const defaultLandmarks = [
-            { id: 1, name: "Legislative Assembly of Nunavut", address: "926 Unikkaarvik Rd", lat: 63.7495, lng: -68.5162 },
-            { id: 2, name: "Unikkaarvik Visitor Centre", address: "220 Unikkaarvik Rd", lat: 63.7438, lng: -68.5150 },
-            { id: 3, name: "St. Jude's Anglican Cathedral", address: "Mattaaq St", lat: 63.7463, lng: -68.5147 }
+            { id: 1, name: "Astro Theatre", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7478, lng: -68.5144 },
+            { id: 2, name: "Frobisher Inn", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7475, lng: -68.5141 },
+            { id: 3, name: "CBC Nunavut", address: "Building 224, Iqaluit, NU", lat: 63.7452, lng: -68.5155 },
+            { id: 4, name: "Northmart", address: "Aqqaluk Rd, Iqaluit, NU", lat: 63.7481, lng: -68.5189 },
+            { id: 5, name: "Legislative Assembly of Nunavut", address: "926 Unikkaarvik Rd", lat: 63.7495, lng: -68.5162 },
+            { id: 6, name: "Unikkaarvik Visitor Centre", address: "220 Unikkaarvik Rd", lat: 63.7438, lng: -68.5150 },
+            { id: 7, name: "St. Jude's Anglican Cathedral", address: "Mattaaq St", lat: 63.7463, lng: -68.5147 }
         ];
 
         let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
