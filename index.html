@@ -186,15 +186,15 @@
         let currentUser = null;
         let markersGroup = [];
 
-        // Complete default landmarks list
+        // Complete default landmarks list with image attachments linked
         const defaultLandmarks = [
-            { id: 1, name: "Astro Theatre", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7478, lng: -68.5144 },
-            { id: 2, name: "Frobisher Inn", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7475, lng: -68.5141 },
-            { id: 3, name: "CBC Nunavut", address: "Building 224, Iqaluit, NU", lat: 63.7452, lng: -68.5155 },
-            { id: 4, name: "Northmart", address: "Aqqaluk Rd, Iqaluit, NU", lat: 63.7481, lng: -68.5189 },
-            { id: 5, name: "Legislative Assembly of Nunavut", address: "926 Unikkaarvik Rd", lat: 63.7495, lng: -68.5162 },
-            { id: 6, name: "Unikkaarvik Visitor Centre", address: "220 Unikkaarvik Rd", lat: 63.7438, lng: -68.5150 },
-            { id: 7, name: "St. Jude's Anglican Cathedral", address: "Mattaaq St", lat: 63.7463, lng: -68.5147 }
+            { id: 1, name: "Astro Theatre", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7478, lng: -68.5144, img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba" },
+            { id: 2, name: "Frobisher Inn", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7475, lng: -68.5141, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945" },
+            { id: 3, name: "CBC Nunavut", address: "Building 224, Iqaluit, NU", lat: 63.7452, lng: -68.5155, img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167" },
+            { id: 4, name: "Northmart", address: "Aqqaluk Rd, Iqaluit, NU", lat: 63.7481, lng: -68.5189, img: "https://images.unsplash.com/photo-1578916171728-46686eac8d58" },
+            { id: 5, name: "Legislative Assembly of Nunavut", address: "926 Unikkaarvik Rd", lat: 63.7495, lng: -68.5162, img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9" },
+            { id: 6, name: "Unikkaarvik Visitor Centre", address: "220 Unikkaarvik Rd", lat: 63.7438, lng: -68.5150, img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1" },
+            { id: 7, name: "St. Jude's Anglican Cathedral", address: "Mattaaq St", lat: 63.7463, lng: -68.5147, img: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092" }
         ];
 
         let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
@@ -296,13 +296,30 @@
             markersGroup = [];
 
             landmarks.forEach(place => {
+                const fallbackImg = 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb';
+                const imageSrc = place.img || fallbackImg;
+
                 const card = document.createElement('div');
-                card.className = "bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl p-3 text-xs space-y-1 transition cursor-pointer";
+                card.className = "bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl p-3 text-xs space-y-2 transition cursor-pointer flex items-center gap-3";
                 card.onclick = () => map.flyTo([place.lat, place.lng], 16);
-                card.innerHTML = `<h4 class="font-bold text-cyan-400">${place.name}</h4><p class="text-slate-400">${place.address}</p>`;
+                card.innerHTML = `
+                    <img src="${imageSrc}" onerror="this.src='${fallbackImg}'" class="w-12 h-12 rounded-lg object-cover border border-slate-800 shrink-0" alt="${place.name}" />
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-bold text-cyan-400 truncate">${place.name}</h4>
+                        <p class="text-slate-400 truncate">${place.address}</p>
+                    </div>
+                `;
                 list.appendChild(card);
 
-                const marker = L.marker([place.lat, place.lng]).addTo(map).bindPopup(`<b>${place.name}</b><br>${place.address}`);
+                const popupContent = `
+                    <div class="space-y-1.5 max-w-[200px]">
+                        <img src="${imageSrc}" onerror="this.src='${fallbackImg}'" class="w-full h-24 object-cover rounded-lg border border-slate-700/50 mb-1" alt="${place.name}" />
+                        <b class="text-cyan-300 text-sm block leading-tight">${place.name}</b>
+                        <p class="text-xs text-slate-300">${place.address}</p>
+                    </div>
+                `;
+
+                const marker = L.marker([place.lat, place.lng]).addTo(map).bindPopup(popupContent);
                 markersGroup.push(marker);
             });
         }
@@ -313,7 +330,7 @@
             landmarks.forEach((place, index) => {
                 const matches = place.name.toLowerCase().includes(query) || place.address.toLowerCase().includes(query);
                 if (cards[index]) {
-                    cards[index].style.display = matches ? 'block' : 'none';
+                    cards[index].style.display = matches ? 'flex' : 'none';
                 }
             });
         }
