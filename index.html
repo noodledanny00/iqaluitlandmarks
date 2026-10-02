@@ -247,16 +247,57 @@
             shadowSize: [41, 41]
         });
 
-        // Default landmarks with category tags
+        // Default landmarks including new custom additions
         const defaultLandmarks = [
-            { id: 1, name: "Black Heart Café", category: "snack", address: "Building 756, Iqaluit, NU", lat: 63.7461, lng: -68.5173, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb" },
-            { id: 2, name: "Frobisher Inn / Caribou House", category: "snack", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7475, lng: -68.5141, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945" },
-            { id: 3, name: "Astro Theatre", category: "sight", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7478, lng: -68.5144, img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba" },
-            { id: 4, name: "CBC Nunavut", category: "sight", address: "Building 224, Iqaluit, NU", lat: 63.7452, lng: -68.5155, img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167" },
-            { id: 5, name: "Northmart", category: "snack", address: "Aqqaluk Rd, Iqaluit, NU", lat: 63.7481, lng: -68.5189, img: "https://images.unsplash.com/photo-1578916171728-46686eac8d58" },
-            { id: 6, name: "Legislative Assembly of Nunavut", category: "sight", address: "926 Unikkaarvik Rd", lat: 63.7495, lng: -68.5162, img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9" },
-            { id: 7, name: "Unikkaarvik Visitor Centre", category: "sight", address: "220 Unikkaarvik Rd", lat: 63.7438, lng: -68.5150, img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1" },
-            { id: 8, name: "St. Jude's Anglican Cathedral", category: "sight", address: "Mattaaq St", lat: 63.7463, lng: -68.5147, img: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092" }
+            { 
+                id: 1, 
+                name: "Iqaluit International Airport", 
+                category: "sight", 
+                address: "1520 Airport Rd, Iqaluit, NU", 
+                lat: 63.7564, 
+                lng: -68.5558, 
+                img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05",
+                note: "Iqaluit International Airport is a great place to book flights and see many great workers. Maybe you can book the next trip to Iqaluit!",
+                links: [
+                    { label: "Airport Website", url: "https://www.iqaluitairport.ca/" },
+                    { label: "Canadian North", url: "https://canadiannorth.com/" }
+                ]
+            },
+            { 
+                id: 2, 
+                name: "Akausisarvik Mental Health Facility", 
+                category: "sight", 
+                address: "503 Niaqunngusiariaq, Iqaluit, NU", 
+                lat: 63.7533, 
+                lng: -68.5083, 
+                img: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d" 
+            },
+            { 
+                id: 3, 
+                name: "Inuksuk High School", 
+                category: "sight", 
+                address: "501 Niaqunngusiariaq, Iqaluit, NU", 
+                lat: 63.7492, 
+                lng: -68.5139, 
+                img: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1" 
+            },
+            { 
+                id: 4, 
+                name: "Stay By The Sea", 
+                category: "sight", 
+                address: "2536 Paurngaq, Iqaluit, NU", 
+                lat: 63.7380, 
+                lng: -68.5080, 
+                img: "https://images.unsplash.com/photo-1566073771259-6a8506099945" 
+            },
+            { id: 5, name: "Black Heart Café", category: "snack", address: "Building 756, Iqaluit, NU", lat: 63.7461, lng: -68.5173, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb" },
+            { id: 6, name: "Frobisher Inn / Caribou House", category: "snack", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7475, lng: -68.5141, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945" },
+            { id: 7, name: "Astro Theatre", category: "sight", address: "Astro Hill Complex, Iqaluit, NU", lat: 63.7478, lng: -68.5144, img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba" },
+            { id: 8, name: "CBC Nunavut", category: "sight", address: "Building 224, Iqaluit, NU", lat: 63.7452, lng: -68.5155, img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167" },
+            { id: 9, name: "Northmart", category: "snack", address: "Aqqaluk Rd, Iqaluit, NU", lat: 63.7481, lng: -68.5189, img: "https://images.unsplash.com/photo-1578916171728-46686eac8d58" },
+            { id: 10, name: "Legislative Assembly of Nunavut", category: "sight", address: "926 Unikkaarvik Rd", lat: 63.7495, lng: -68.5162, img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9" },
+            { id: 11, name: "Unikkaarvik Visitor Centre", category: "sight", address: "220 Unikkaarvik Rd", lat: 63.7438, lng: -68.5150, img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1" },
+            { id: 12, name: "St. Jude's Anglican Cathedral", category: "sight", address: "Mattaaq St", lat: 63.7463, lng: -68.5147, img: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092" }
         ];
 
         let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
@@ -306,7 +347,7 @@
         function openAddModal() { document.getElementById('add-place-modal').classList.remove('hidden'); }
         function closeAddModal() { document.getElementById('add-place-modal').classList.add('hidden'); }
 
-        // Free Image Changing Functions (No Sign-In Required)
+        // Free Image Changing Functions
         function triggerImageChange(landmarkId, event) {
             if(event) event.stopPropagation();
             targetLandmarkIdForImage = landmarkId;
@@ -361,7 +402,7 @@
         }
 
         // Initialize Map
-        const map = L.map('map').setView([63.7467, -68.5170], 14);
+        const map = L.map('map').setView([63.7467, -68.5170], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
         map.on('popupclose', () => {
@@ -421,8 +462,20 @@
                 const imageSrc = place.img || fallbackImg;
                 const isSnack = place.category === 'snack';
 
+                let extraContent = '';
+                if (place.note) {
+                    extraContent += `<p class="text-[11px] text-cyan-200 mt-1 italic border-l-2 border-cyan-500 pl-1.5 py-0.5">${place.note}</p>`;
+                }
+                if (place.links && place.links.length > 0) {
+                    extraContent += `<div class="flex flex-wrap gap-1 mt-2">`;
+                    place.links.forEach(link => {
+                        extraContent += `<a href="${link.url}" target="_blank" rel="noopener noreferrer" class="bg-cyan-900/80 hover:bg-cyan-800 text-cyan-200 text-[10px] px-2 py-1 rounded border border-cyan-700/60 transition flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i> ${link.label}</a>`;
+                    });
+                    extraContent += `</div>`;
+                }
+
                 const popupContent = `
-                    <div class="space-y-1.5 max-w-[200px]">
+                    <div class="space-y-1.5 max-w-[220px]">
                         <div class="relative group">
                             <img src="${imageSrc}" onerror="this.src='${fallbackImg}'" class="w-full h-24 object-cover rounded-lg border border-slate-700/50 mb-1" alt="${place.name}" />
                             <button onclick="triggerImageChange(${place.id}, event)" class="absolute top-1 right-1 bg-slate-900/80 hover:bg-slate-900 text-cyan-300 border border-slate-700 px-1.5 py-0.5 rounded text-[10px]">
@@ -432,6 +485,7 @@
                         <b class="text-cyan-300 text-sm block leading-tight">${place.name}</b>
                         <p class="text-xs text-slate-300">${place.address}</p>
                         ${isSnack ? '<span class="inline-block mt-1 text-[10px] bg-amber-950 text-amber-400 border border-amber-800/50 px-2 py-0.5 rounded-full"><i class="fa-solid fa-mug-hot mr-1"></i>Snack & Coffee Spot</span>' : ''}
+                        ${extraContent}
                     </div>
                 `;
 
@@ -448,7 +502,7 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl p-3 text-xs space-y-2 transition cursor-pointer flex items-center gap-3 relative group";
                 card.onclick = () => {
-                    map.flyTo([place.lat, place.lng], 16);
+                    map.flyTo([place.lat, place.lng], 15);
                     if (activeMarker && activeMarker !== marker) activeMarker.setIcon(defaultIcon);
                     marker.setIcon(selectedIcon);
                     activeMarker = marker;
