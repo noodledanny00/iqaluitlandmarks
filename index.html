@@ -11,8 +11,8 @@
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Google Identity Services Library -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Microsoft Authentication Library (MSAL.js v2) -->
+    <script src="https://alcdn.msauth.net/browser/2.35.0/js/msal-browser.min.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
@@ -43,9 +43,6 @@
                 <i id="add-place-icon" class="fa-solid fa-lock text-xs"></i> Add Place
             </button>
 
-            <!-- Google Sign In Button Container -->
-            <div id="g_id_signin"></div>
-
             <!-- Microsoft Sign In Button -->
             <button id="ms-signin-btn" onclick="signInWithMicrosoft()" class="bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700/80 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition active:scale-95">
                 <svg class="w-4 h-4" viewBox="0 0 23 23">
@@ -54,14 +51,18 @@
                     <path fill="#05a6f0" d="M1 12h10v10H1z"/>
                     <path fill="#ffba08" d="M12 12h10v10H1z"/>
                 </svg>
-                Microsoft
+                Sign in with Microsoft
             </button>
 
-            <!-- Signed In User Badge -->
-            <div id="user-badge" class="hidden bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
-                <i class="fa-solid fa-circle-check"></i>
-                <span id="user-name">Signed In</span>
-                <button onclick="signOut()" class="ml-1 text-slate-400 hover:text-red-400 text-xs"><i class="fa-solid fa-right-from-bracket"></i></button>
+            <!-- Signed In User Badge & Sign Out Button -->
+            <div id="user-badge" class="hidden flex items-center gap-2">
+                <div class="bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span id="user-name">Signed In</span>
+                </div>
+                <button id="signout-btn" onclick="signOutWithMicrosoft()" class="bg-slate-800 hover:bg-red-950/80 text-slate-300 hover:text-red-400 border border-slate-700 hover:border-red-800/80 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign out
+                </button>
             </div>
         </div>
     </header>
@@ -147,9 +148,23 @@
     <!-- JavaScript Logic -->
     <script>
         // Authentication Credentials Config
-        const GOOGLE_CLIENT_ID = "685839153590-a3c6i9s14saa9omj2plelf5sj5ebhh2v.apps.googleusercontent.com";
         const MS_CLIENT_ID = "dc2e8a2e-cbf9-4e06-b1a1-54e79552be42";
         const MS_TENANT_ID = "56efaacb-a7cf-4c61-9f72-71c254285f13";
+
+        // Initialize MSAL Instance
+        const msalConfig = {
+            auth: {
+                clientId: MS_CLIENT_ID,
+                authority: `https://login.microsoftonline.com/${MS_TENANT_ID}`,
+                redirectUri: window.location.href.split('#')[0].split('?')[0]
+            },
+            cache: {
+                cacheLocation: "sessionStorage",
+                storeAuthStateInCookie: false
+            }
+        };
+
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
 
         let currentUser = null;
         let markersGroup = [];
@@ -175,7 +190,6 @@
             shadowSize: [41, 41]
         });
 
-        // 12 Landmarks with Website Links
         const defaultLandmarks = [
             {
                 id: 1,
@@ -217,7 +231,8 @@
                 address: "Building 224, Iqaluit, NU",
                 lat: 63.7452,
                 lng: -68.5155,
-                img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167"
+                img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167",
+                officialLink: "https://www.cbc.ca/news/canada/north"
             },
             {
                 id: 5,
@@ -268,7 +283,8 @@
                 lat: 63.7505,
                 lng: -68.5080,
                 img: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d",
-                note: "Akausisarvik Mental Health Facility provides community health and mental health support services."
+                note: "Akausisarvik Mental Health Facility provides community health and mental health support services.",
+                officialLink: "https://www.gov.nu.ca/health"
             },
             {
                 id: 10,
@@ -300,87 +316,84 @@
                 lat: 63.7564,
                 lng: -68.5559,
                 img: "https://www.iqaluitairport.ca/sites/default/files/styles/header/public/2025-06/YFB-Terminal%20airside_header.jpg?itok=AJYII8Yy",
-                note: "Iqaluit International Airport is a great place to book flights and explore travel options."
+                note: "Iqaluit International Airport is a great place to book flights and explore travel options.",
+                officialLink: "https://canadiannorth.com/"
             }
         ];
 
         let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             map = L.map('map').setView([63.7467, -68.5170], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-            map.on('popupclose', () => {
-                if (activeMarker) {
-                    activeMarker.setIcon(defaultIcon);
-                    activeMarker = null;
-                }
-            });
-
-            checkSavedUser();
-            initGoogleSignIn();
+            await checkActiveAccount();
             renderLandmarks();
         });
 
-        // Initialize Google Sign In Button
-        function initGoogleSignIn() {
-            if (window.google) {
-                google.accounts.id.initialize({
-                    client_id: GOOGLE_CLIENT_ID,
-                    callback: handleCredentialResponse
+        async function checkActiveAccount() {
+            const accounts = msalInstance.getAllAccounts();
+            if (accounts.length > 0) {
+                msalInstance.setActiveAccount(accounts[0]);
+                currentUser = { name: accounts[0].name || accounts[0].username };
+                updateUIForSignedIn();
+            } else {
+                currentUser = null;
+                updateUIForSignedOut();
+            }
+        }
+
+        async function signInWithMicrosoft() {
+            try {
+                const loginResponse = await msalInstance.loginPopup({
+                    scopes: ["User.Read"]
                 });
-                google.accounts.id.renderButton(
-                    document.getElementById("g_id_signin"),
-                    { theme: "outline", size: "medium" }
-                );
+                msalInstance.setActiveAccount(loginResponse.account);
+                currentUser = { name: loginResponse.account.name || loginResponse.account.username };
+                updateUIForSignedIn();
+            } catch (error) {
+                console.error("Microsoft sign-in error or cancelled:", error);
             }
         }
 
-        function handleCredentialResponse(response) {
-            setSignedInUser("Google User");
-        }
-
-        function signInWithMicrosoft() {
-            setSignedInUser("Microsoft User");
-        }
-
-        function setSignedInUser(name) {
-            currentUser = { name: name };
-            localStorage.setItem('iqaluit_user', JSON.stringify(currentUser));
-            updateUIForAuth();
-        }
-
-        function checkSavedUser() {
-            const stored = localStorage.getItem('iqaluit_user');
-            if (stored) {
-                currentUser = JSON.parse(stored);
-                updateUIForAuth();
+        async function signOutWithMicrosoft() {
+            try {
+                const currentAccount = msalInstance.getActiveAccount();
+                await msalInstance.logoutPopup({
+                    account: currentAccount,
+                    mainWindowRedirectUri: window.location.href.split('#')[0].split('?')[0]
+                });
+                currentUser = null;
+                updateUIForSignedOut();
+            } catch (error) {
+                console.error("Microsoft sign-out error:", error);
+                currentUser = null;
+                updateUIForSignedOut();
             }
         }
 
-        function updateUIForAuth() {
+        function updateUIForSignedIn() {
             const addBtn = document.getElementById('add-place-btn');
             addBtn.className = "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition shadow-md shadow-cyan-500/10 cursor-pointer active:scale-95";
             document.getElementById('add-place-icon').className = "fa-solid fa-plus text-xs";
 
-            const gBtn = document.getElementById('g_id_signin');
-            const msBtn = document.getElementById('ms-signin-btn');
-            if (gBtn) gBtn.classList.add('hidden');
-            if (msBtn) msBtn.classList.add('hidden');
-
+            document.getElementById('ms-signin-btn').classList.add('hidden');
             document.getElementById('user-name').innerText = currentUser.name;
             document.getElementById('user-badge').classList.remove('hidden');
         }
 
-        function signOut() {
-            localStorage.removeItem('iqaluit_user');
-            currentUser = null;
-            location.reload();
+        function updateUIForSignedOut() {
+            const addBtn = document.getElementById('add-place-btn');
+            addBtn.className = "bg-slate-800 text-slate-500 border border-slate-700/60 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-not-allowed";
+            document.getElementById('add-place-icon').className = "fa-solid fa-lock text-xs";
+
+            document.getElementById('ms-signin-btn').classList.remove('hidden');
+            document.getElementById('user-badge').classList.add('hidden');
         }
 
         function handleAddPlaceClick() {
             if (!currentUser) {
-                alert("Please sign in with Google or Microsoft first!");
+                alert("Please sign in with Microsoft first!");
             } else {
                 openAddModal();
             }
@@ -443,7 +456,9 @@
                 map.setView([place.lat, place.lng], 15);
                 const marker = markersGroup.find(m => m.options.landmarkId === id);
                 if (marker) {
-                    marker.openPopup();
+                    if (activeMarker) activeMarker.setIcon(defaultIcon);
+                    marker.setIcon(selectedIcon);
+                    activeMarker = marker;
                 }
             }
         }
@@ -477,26 +492,19 @@
                         <h4 class="font-semibold text-xs text-slate-100 truncate">${place.name}</h4>
                         <p class="text-[11px] text-slate-400 truncate mt-0.5"><i class="fa-solid fa-location-dot text-cyan-400 text-[10px] mr-1"></i>${place.address}</p>
                         ${place.note ? `<p class="text-[10px] text-slate-300 mt-1 line-clamp-2">${place.note}</p>` : ''}
+                        ${place.officialLink ? `<a href="${place.officialLink}" target="_blank" onclick="event.stopPropagation()" class="inline-block mt-1.5 text-[10px] text-cyan-400 hover:text-cyan-300 underline font-medium">Official Website <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i></a>` : ''}
                     </div>
                 `;
                 list.appendChild(card);
 
                 if (map) {
                     const marker = L.marker([place.lat, place.lng], { icon: defaultIcon, landmarkId: place.id }).addTo(map);
-                    let popupContent = `
-                        <div class="space-y-2 max-w-[210px]">
-                            <img src="${place.img}" class="w-full h-24 object-cover rounded-lg">
-                            <h4 class="font-bold text-sm text-slate-100">${place.name}</h4>
-                            <p class="text-xs text-slate-300">${place.address}</p>
-                            ${place.note ? `<p class="text-xs text-slate-400 italic">${place.note}</p>` : ''}
-                            ${place.officialLink ? `<a href="${place.officialLink}" target="_blank" class="inline-block mt-1 bg-cyan-600 text-white text-[10px] px-2 py-1 rounded hover:bg-cyan-500 font-medium">Visit Website <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>` : ''}
-                        </div>
-                    `;
-                    marker.bindPopup(popupContent);
+                    
                     marker.on('click', () => {
                         if (activeMarker) activeMarker.setIcon(defaultIcon);
                         marker.setIcon(selectedIcon);
                         activeMarker = marker;
+                        map.setView([place.lat, place.lng], 15);
                     });
                     markersGroup.push(marker);
                 }
