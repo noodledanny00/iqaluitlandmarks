@@ -11,8 +11,8 @@
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- MSAL JS -->
-    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
@@ -65,10 +65,12 @@
     <div id="auth-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-sm w-full space-y-4">
             <h3 class="text-base font-bold text-slate-100">Sign In Required</h3>
-            <p class="text-xs text-slate-400">Please sign in with your Microsoft account to add new landmark locations.</p>
-            <div class="flex justify-end gap-2">
+            <p class="text-xs text-slate-400">Please sign in with your Google account to add new landmark locations.</p>
+            <div class="flex justify-center py-2">
+                <div id="google-signin-btn"></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
                 <button onclick="closeAuthModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium hover:bg-slate-700">Cancel</button>
-                <button onclick="loginWithMicrosoft()" class="px-3 py-1.5 rounded-lg bg-cyan-600 text-white text-xs font-medium hover:bg-cyan-500">Sign In with Microsoft</button>
             </div>
         </div>
     </div>
@@ -140,16 +142,8 @@
 
     <!-- JavaScript Logic -->
     <script>
-        const msalConfig = {
-            auth: {
-                clientId: "a2335a85-a5ec-4061-97f9-4e1807b76793",
-                authority: "https://login.microsoftonline.com/common",
-                redirectUri: "https://noodledanny00.github.io/iqaluitlandmarks/"
-            },
-            cache: { cacheLocation: "localStorage" }
-        };
+        const GOOGLE_CLIENT_ID = "600276701886-fpqunmts8eq2t1an0i8efj8fkegfi0iu.apps.googleusercontent.com";
 
-        let msalInstance = null;
         let currentUser = null;
         let markersGroup = [];
         let activeMarker = null;
@@ -311,8 +305,37 @@
 
         let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
 
-        // Initialize MSAL & Map on Load
-        window.addEventListener('DOMContentLoaded', async () => {
+        // Helper to parse JWT payload from Google ID Token
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Google Identity Callback
+        function handleCredentialResponse(response) {
+            const userData = parseJwt(response.credential);
+            if (userData) {
+                currentUser = {
+                    name: userData.name,
+                    email: userData.email,
+                    picture: userData.picture
+                };
+                updateUIForUser();
+                closeAuthModal();
+                openAddModal();
+            }
+        }
+
+        // Initialize Map & Google Identity on Load
+        window.addEventListener('DOMContentLoaded', () => {
             // Initialize Leaflet Map
             map = L.map('map').setView([63.7467, -68.5170], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
@@ -324,17 +347,16 @@
                 }
             });
 
-            // Initialize MSAL Authentication
-            try {
-                msalInstance = new msal.PublicClientApplication(msalConfig);
-                await msalInstance.initialize();
-                const accounts = msalInstance.getAllAccounts();
-                if (accounts.length > 0) {
-                    currentUser = accounts[0];
-                }
-                updateUIForUser();
-            } catch (err) {
-                console.error("MSAL initialization failed:", err);
+            // Initialize Google Identity Services
+            if (window.google && google.accounts) {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse
+                });
+                google.accounts.id.renderButton(
+                    document.getElementById("google-signin-btn"),
+                    { theme: "outline", size: "medium" }
+                );
             }
 
             // Initial rendering of landmark pins and sidebar cards
@@ -342,29 +364,19 @@
         });
 
         function handleAddPlaceClick() {
-            if (!currentUser) { openAuthModal(); } else { openAddModal(); }
+            if (!currentUser) { 
+                openAuthModal(); 
+            } else { 
+                openAddModal(); 
+            }
         }
 
         function handleAuthClick() {
             if (currentUser) {
-                msalInstance.logoutPopup().then(() => {
-                    currentUser = null;
-                    updateUIForUser();
-                });
-            } else {
-                loginWithMicrosoft();
-            }
-        }
-
-        async function loginWithMicrosoft() {
-            try {
-                const loginResponse = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-                currentUser = loginResponse.account;
+                currentUser = null;
                 updateUIForUser();
-                closeAuthModal();
-                openAddModal();
-            } catch (error) {
-                console.error("Microsoft Login Error:", error);
+            } else {
+                openAuthModal();
             }
         }
 
@@ -373,7 +385,15 @@
             authLabel.innerText = currentUser ? (currentUser.name || "Signed In") : "Sign In";
         }
 
-        function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
+        function openAuthModal() { 
+            document.getElementById('auth-modal').classList.remove('hidden'); 
+            if (window.google && google.accounts) {
+                google.accounts.id.renderButton(
+                    document.getElementById("google-signin-btn"),
+                    { theme: "outline", size: "medium" }
+                );
+            }
+        }
         function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
         function openAddModal() { document.getElementById('add-place-modal').classList.remove('hidden'); }
         function closeAddModal() { document.getElementById('add-place-modal').classList.add('hidden'); }
