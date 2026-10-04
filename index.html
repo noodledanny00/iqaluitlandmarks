@@ -13,6 +13,15 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Microsoft Authentication Library (MSAL.js v2) -->
     <script src="https://alcdn.msauth.net/browser/2.35.0/js/msal-browser.min.js"></script>
+    <style>
+        /* Ensure the modal overlay and container sit above Leaflet map layers */
+        .modal-overlay, 
+        .modal-container, 
+        #add-place-modal {
+            z-index: 9999 !important;
+            position: fixed;
+        }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
@@ -92,7 +101,7 @@
     </main>
 
     <!-- Add Place Modal -->
-    <div id="add-place-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="add-place-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="text-base font-bold text-slate-100">Add New Landmark</h3>
