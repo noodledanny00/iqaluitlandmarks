@@ -45,12 +45,7 @@
 
             <!-- Microsoft Sign In Button -->
             <button id="ms-signin-btn" onclick="signInWithMicrosoft()" class="bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700/80 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition active:scale-95">
-                <svg class="w-4 h-4" viewBox="0 0 23 23">
-                    <path fill="#f35325" d="M1 1h10v10H1z"/>
-                    <path fill="#81bc06" d="M12 1h10v10H1z"/>
-                    <path fill="#05a6f0" d="M1 12h10v10H1z"/>
-                    <path fill="#ffba08" d="M12 12h10v10H1z"/>
-                </svg>
+                <img src="https://banner2.cleanpng.com/20171220/fqq/av2e7ca6g.webp" alt="Microsoft Logo" class="w-4 h-4 object-contain">
                 Sign in with Microsoft
             </button>
 
@@ -147,9 +142,11 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // Authentication Credentials Config
+        // Client ID from App Registration
         const MS_CLIENT_ID = "dc2e8a2e-cbf9-4e06-b1a1-54e79552be42";
-        const MS_TENANT_ID = "56efaacb-a7cf-4c61-9f72-71c254285f13";
+        
+        // Changed to "common" to support both Personal Microsoft Accounts (@outlook/@live) & Tenant Accounts
+        const MS_TENANT_ID = "common";
 
         // Initialize MSAL Instance
         const msalConfig = {
