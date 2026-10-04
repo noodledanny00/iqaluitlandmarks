@@ -21,6 +21,17 @@
             z-index: 9999 !important;
             position: fixed;
         }
+        /* Custom Leaflet popup styling for dark theme */
+        .leaflet-popup-content-wrapper {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+            border: 1px solid #334155 !important;
+            border-radius: 0.75rem !important;
+            padding: 4px !important;
+        }
+        .leaflet-popup-tip {
+            background-color: #0f172a !important;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
@@ -151,13 +162,9 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // Client ID from App Registration
         const MS_CLIENT_ID = "dc2e8a2e-cbf9-4e06-b1a1-54e79552be42";
-        
-        // Changed to "common" to support both Personal Microsoft Accounts (@outlook/@live) & Tenant Accounts
         const MS_TENANT_ID = "common";
 
-        // Initialize MSAL Instance
         const msalConfig = {
             auth: {
                 clientId: MS_CLIENT_ID,
@@ -360,13 +367,13 @@
             },
             {
                 id: 16,
-                name: "Quick Stop / Tim Hortons",
+                name: "Quick Stop Tim Hortons ᐅᖅᓱᐊᓗᒃᑖᕐᕕᒃ",
                 category: "snack",
-                address: "Apex Rd, Iqaluit, NU",
-                lat: 63.7455,
-                lng: -68.5162,
+                address: "2227 Apex Quickstop, Iqaluit, NU X0A 3H0",
+                lat: 63.7513,
+                lng: -68.5038,
                 img: "https://cdn10.localdatacdn.com/nu/iqaluit/7089971/original/MoxidbrsEA.jpeg",
-                note: "Convenience store and Tim Hortons express location situated along Apex Road.",
+                note: "Gas station, convenience store, and Tim Hortons express location on Apex Road.",
                 officialLink: "https://www.timhortons.ca/"
             },
             {
@@ -382,7 +389,7 @@
             }
         ];
 
-        let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
+        let landmarks = defaultLandmarks;
 
         window.addEventListener('DOMContentLoaded', async () => {
             map = L.map('map').setView([63.7467, -68.5170], 13);
@@ -468,10 +475,6 @@
             document.getElementById('add-place-modal').classList.add('hidden');
         }
 
-        function saveLandmarksToStorage() {
-            localStorage.setItem('iqaluit_landmarks', JSON.stringify(landmarks));
-        }
-
         function addNewPlace(event) {
             event.preventDefault();
             if (!currentUser) {
@@ -490,7 +493,6 @@
                 img: document.getElementById('add-img').value || 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb'
             };
             landmarks.push(newPlace);
-            saveLandmarksToStorage();
             closeAddModal();
             renderLandmarks();
         }
@@ -520,6 +522,7 @@
                     if (activeMarker) activeMarker.setIcon(defaultIcon);
                     marker.setIcon(selectedIcon);
                     activeMarker = marker;
+                    marker.openPopup();
                 }
             }
         }
@@ -559,7 +562,18 @@
                 list.appendChild(card);
 
                 if (map) {
-                    const marker = L.marker([place.lat, place.lng], { icon: defaultIcon, landmarkId: place.id }).addTo(map);
+                    const popupContent = `
+                        <div class="p-1 min-w-[180px]">
+                            <img src="${place.img}" class="w-full h-24 object-cover rounded-md mb-2">
+                            <h3 class="font-bold text-sm text-cyan-400 mb-0.5">${place.name}</h3>
+                            <p class="text-[11px] text-slate-300 mb-1"><i class="fa-solid fa-location-dot text-cyan-400 text-[9px] mr-1"></i>${place.address}</p>
+                            ${place.officialLink ? `<a href="${place.officialLink}" target="_blank" class="text-[11px] text-cyan-400 underline font-medium">Website <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>` : ''}
+                        </div>
+                    `;
+
+                    const marker = L.marker([place.lat, place.lng], { icon: defaultIcon, landmarkId: place.id })
+                        .bindPopup(popupContent)
+                        .addTo(map);
                     
                     marker.on('click', () => {
                         if (activeMarker) activeMarker.setIcon(defaultIcon);
