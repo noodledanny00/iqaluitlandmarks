@@ -146,6 +146,11 @@
 
     <!-- JavaScript Logic -->
     <script>
+        // Authentication Credentials Config
+        const GOOGLE_CLIENT_ID = "685839153590-a3c6i9s14saa9omj2plelf5sj5ebhh2v.apps.googleusercontent.com";
+        const MS_CLIENT_ID = "dc2e8a2e-cbf9-4e06-b1a1-54e79552be42";
+        const MS_TENANT_ID = "56efaacb-a7cf-4c61-9f72-71c254285f13";
+
         let currentUser = null;
         let markersGroup = [];
         let activeMarker = null;
@@ -321,7 +326,7 @@
         function initGoogleSignIn() {
             if (window.google) {
                 google.accounts.id.initialize({
-                    client_id: "100000000000-example.apps.googleusercontent.com", // Add valid ID if available
+                    client_id: GOOGLE_CLIENT_ID,
                     callback: handleCredentialResponse
                 });
                 google.accounts.id.renderButton(
