@@ -13,6 +13,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Microsoft MSAL.js -->
+    <script src="https://alcdn.msauth.net/browser/2.35.0/js/msal-browser.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
@@ -61,14 +63,34 @@
         </section>
     </main>
 
-    <!-- Auth Modal -->
+    <!-- Auth Modal (Both Google & Microsoft Options) -->
     <div id="auth-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-sm w-full space-y-4">
-            <h3 class="text-base font-bold text-slate-100">Sign In Required</h3>
-            <p class="text-xs text-slate-400">Please sign in with your Google account to add new landmark locations.</p>
-            <div class="flex justify-center py-2">
-                <div id="google-signin-btn"></div>
+            <h3 class="text-base font-bold text-slate-100">Sign In</h3>
+            <p class="text-xs text-slate-400">Choose a provider to sign in and add new landmarks:</p>
+            
+            <div class="flex flex-col items-center gap-3 py-2 w-full">
+                <!-- Google Sign-In Button Container -->
+                <div id="google-signin-btn" class="w-full flex justify-center"></div>
+
+                <div class="flex items-center my-1 w-full">
+                    <div class="flex-1 border-t border-slate-800"></div>
+                    <span class="px-2 text-[10px] text-slate-500 uppercase">or</span>
+                    <div class="flex-1 border-t border-slate-800"></div>
+                </div>
+
+                <!-- Microsoft Sign-In Button -->
+                <button onclick="signInWithMicrosoft()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 font-medium text-xs px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition">
+                    <svg class="w-4 h-4" viewBox="0 0 23 23">
+                        <path fill="#f35325" d="M1 1h10v10H1z"/>
+                        <path fill="#81bc06" d="M12 1h10v10H12z"/>
+                        <path fill="#05a6f0" d="M1 12h10v10H1z"/>
+                        <path fill="#ffba08" d="M12 12h10v10H12z"/>
+                    </svg>
+                    Sign in with Microsoft
+                </button>
             </div>
+
             <div class="flex justify-end gap-2 pt-2">
                 <button onclick="closeAuthModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium hover:bg-slate-700">Cancel</button>
             </div>
@@ -143,7 +165,9 @@
     <!-- JavaScript Logic -->
     <script>
         const GOOGLE_CLIENT_ID = "600276701886-fpqunmts8eq2t1an0i8efj8fkegfi0iu.apps.googleusercontent.com";
+        const MICROSOFT_CLIENT_ID = "YOUR_MICROSOFT_CLIENT_ID"; // Replace with your Azure App Registration ID if needed
 
+        let msalInstance = null;
         let currentUser = null;
         let markersGroup = [];
         let activeMarker = null;
@@ -151,7 +175,7 @@
         let targetLandmarkIdForImage = null;
         let map = null;
 
-        // Pin Icons
+        // Leaflet Pin Icons
         const defaultIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -170,7 +194,7 @@
             shadowSize: [41, 41]
         });
 
-        // Default landmarks with detailed imagery and official links
+        // Default landmarks dataset
         const defaultLandmarks = [
             {
                 id: 1,
@@ -305,7 +329,7 @@
 
         let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
 
-        // Helper to parse JWT payload from Google ID Token
+        // Parse JWT payload from Google token
         function parseJwt(token) {
             try {
                 const base64Url = token.split('.')[1];
@@ -319,11 +343,12 @@
             }
         }
 
-        // Google Identity Callback
+        // Google Sign-In Callback
         function handleCredentialResponse(response) {
             const userData = parseJwt(response.credential);
             if (userData) {
                 currentUser = {
+                    provider: 'Google',
                     name: userData.name,
                     email: userData.email,
                     picture: userData.picture
@@ -334,9 +359,39 @@
             }
         }
 
-        // Initialize Map & Google Identity on Load
+        // Microsoft Sign-In
+        async function signInWithMicrosoft() {
+            if (!msalInstance) {
+                const msalConfig = {
+                    auth: {
+                        clientId: MICROSOFT_CLIENT_ID,
+                        authority: "https://login.microsoftonline.com/common"
+                    }
+                };
+                msalInstance = new msal.PublicClientApplication(msalConfig);
+                await msalInstance.initialize();
+            }
+
+            try {
+                const loginResponse = await msalInstance.loginPopup({
+                    scopes: ["User.Read"]
+                });
+                currentUser = {
+                    provider: 'Microsoft',
+                    name: loginResponse.account.name || loginResponse.account.username,
+                    email: loginResponse.account.username
+                };
+                updateUIForUser();
+                closeAuthModal();
+                openAddModal();
+            } catch (error) {
+                console.log("Microsoft Sign-In completed or cancelled.");
+            }
+        }
+
+        // Initial setup on load
         window.addEventListener('DOMContentLoaded', () => {
-            // Initialize Leaflet Map
+            // Leaflet Map Initialization
             map = L.map('map').setView([63.7467, -68.5170], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
@@ -347,19 +402,14 @@
                 }
             });
 
-            // Initialize Google Identity Services
+            // Google Identity Initialization
             if (window.google && google.accounts) {
                 google.accounts.id.initialize({
                     client_id: GOOGLE_CLIENT_ID,
                     callback: handleCredentialResponse
                 });
-                google.accounts.id.renderButton(
-                    document.getElementById("google-signin-btn"),
-                    { theme: "outline", size: "medium" }
-                );
             }
 
-            // Initial rendering of landmark pins and sidebar cards
             renderLandmarks();
         });
 
@@ -394,6 +444,7 @@
                 );
             }
         }
+
         function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
         function openAddModal() { document.getElementById('add-place-modal').classList.remove('hidden'); }
         function closeAddModal() { document.getElementById('add-place-modal').classList.add('hidden'); }
@@ -516,7 +567,6 @@
             });
 
             filtered.forEach(place => {
-                // Construct external link buttons if available
                 let linksHTML = '';
                 if (place.airportLinks) {
                     linksHTML = `
@@ -533,7 +583,7 @@
                     `;
                 }
 
-                // Create Sidebar Item
+                // Sidebar Card Item
                 const card = document.createElement('div');
                 card.className = "bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-xl p-3 flex gap-3 cursor-pointer transition";
                 card.onclick = () => focusLandmark(place.id);
@@ -552,7 +602,7 @@
                 `;
                 list.appendChild(card);
 
-                // Create Map Pin & Popup
+                // Leaflet Map Marker
                 if (map) {
                     const marker = L.marker([place.lat, place.lng], { icon: defaultIcon, landmarkId: place.id }).addTo(map);
 
