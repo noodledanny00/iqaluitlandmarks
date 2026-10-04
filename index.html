@@ -1,216 +1,144 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="YZ4j7urjkTDUD1dgqrWZSp2m0YSa3E9QcQ3Exyy09RE" />
-    <title>Iqaluit Landmark Explorer - Interactive Map</title>
+    <title>Iqaluit Landmarks Map</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <!-- FontAwesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Inter Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- MSAL.js Browser SDK for Microsoft Auth -->
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- MSAL JS -->
     <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        arctic: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            500: '#0284c7',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                            950: '#082f49',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        #map { width: 100%; height: 100%; z-index: 1; }
-        .leaflet-popup-content-wrapper {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            color: #f8fafc;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-            padding: 4px;
-        }
-        .leaflet-popup-tip {
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-        }
-        .leaflet-popup-content { margin: 12px 14px; line-height: 1.5; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.4); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.7); }
-    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 h-full flex flex-col overflow-hidden select-none">
+<body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
-    <!-- Hidden File Input for Direct Local Image Selection without Sign-In -->
-    <input type="file" id="change-image-file-input" accept="image/*" class="hidden" onchange="processImageFileChange(event)">
-
-    <!-- Top Navigation Header -->
-    <header class="h-16 bg-slate-900/90 border-b border-slate-800 backdrop-blur-md px-4 flex items-center justify-between z-20 shrink-0">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-sky-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                <i class="fa-solid fa-compass text-slate-950 text-xl"></i>
-            </div>
-            <div>
-                <h1 class="font-bold text-lg text-slate-100 leading-tight flex items-center gap-2">
-                    Iqaluit Landmark Explorer
-                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/50">ᐃᖃᓗᐃᑦ</span>
-                </h1>
-                <p class="text-xs text-slate-400 flex items-center gap-2">
-                    <span><i class="fa-solid fa-map-pin text-cyan-400 text-[10px]"></i> Nunavut, Canada</span>
-                </p>
-            </div>
-        </div>
-
+    <!-- Header Navigation -->
+    <header class="bg-slate-900/90 border-b border-slate-800 px-4 py-3 flex items-center justify-between z-10 shrink-0">
         <div class="flex items-center gap-2">
-            <button onclick="handleAddPlaceClick()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl border border-cyan-400/30 transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
-                <i class="fa-solid fa-plus text-sm"></i>
-                <span class="hidden sm:inline">Add Place</span>
+            <i class="fa-solid fa-map-location-dot text-cyan-400 text-xl"></i>
+            <h1 class="text-lg font-bold tracking-wide">Iqaluit Landmarks</h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="handleAddPlaceClick()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-plus"></i> Add Place
             </button>
-
-            <button id="auth-btn" onclick="handleAuthClick()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
-                <i class="fa-brands fa-microsoft text-sky-400 text-sm"></i>
-                <span id="auth-user-label" class="hidden sm:inline">Sign In</span>
+            <button onclick="handleAuthClick()" id="auth-user-label" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                Sign In
             </button>
         </div>
     </header>
 
-    <!-- Main Map Workspace -->
-    <div class="flex-1 flex relative overflow-hidden">
-        <aside id="sidebar" class="w-full md:w-96 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 flex flex-col z-10">
-            <div class="p-4 border-b border-slate-800 space-y-3">
-                <input type="text" id="search-input" onkeyup="filterLandmarks()" placeholder="Search landmarks..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
-
-                <!-- Category Filter Tabs -->
-                <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs">
-                    <button onclick="setCategoryFilter('all')" id="tab-all" class="filter-tab px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-medium shrink-0 transition">
-                        <i class="fa-solid fa-border-all mr-1"></i> All
-                    </button>
-                    <button onclick="setCategoryFilter('snack')" id="tab-snack" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition">
-                        <i class="fa-solid fa-mug-hot mr-1 text-amber-400"></i> Snacks & Coffee
-                    </button>
-                    <button onclick="setCategoryFilter('sight')" id="tab-sight" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition">
-                        <i class="fa-solid fa-camera mr-1 text-cyan-400"></i> Sights
-                    </button>
+    <!-- Main Content Grid -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-80 lg:w-96 bg-slate-900/95 border-r border-slate-800 flex flex-col z-10 shrink-0 h-1/2 md:h-full">
+            <!-- Search & Filters -->
+            <div class="p-3 border-b border-slate-800 space-y-2">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="search-input" onkeyup="filterLandmarks()" placeholder="Search landmarks..." class="w-full bg-slate-800 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-1 text-xs">
+                    <button id="tab-all" onclick="setCategoryFilter('all')" class="filter-tab px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-medium shrink-0 transition">All</button>
+                    <button id="tab-sight" onclick="setCategoryFilter('sight')" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition">Sights</button>
+                    <button id="tab-snack" onclick="setCategoryFilter('snack')" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition">Snacks & Food</button>
                 </div>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-3" id="landmark-list"></div>
+
+            <!-- Landmark List Container -->
+            <div id="landmark-list" class="flex-1 overflow-y-auto p-3 space-y-2.5">
+                <!-- Cards render dynamically -->
+            </div>
         </aside>
 
-        <main class="flex-1 relative">
-            <div id="map"></div>
-        </main>
-    </div>
+        <!-- Interactive Map -->
+        <section class="flex-1 relative h-1/2 md:h-full bg-slate-950">
+            <div id="map" class="w-full h-full"></div>
+        </section>
+    </main>
 
-    <!-- AUTH MODAL -->
-    <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 relative text-center">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <div class="w-12 h-12 rounded-2xl bg-cyan-950 border border-cyan-700 flex items-center justify-center text-cyan-400 text-xl mx-auto mb-2">
-                <i class="fa-brands fa-microsoft"></i>
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-sm w-full space-y-4">
+            <h3 class="text-base font-bold text-slate-100">Sign In Required</h3>
+            <p class="text-xs text-slate-400">Please sign in with your Microsoft account to add new landmark locations.</p>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeAuthModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium hover:bg-slate-700">Cancel</button>
+                <button onclick="loginWithMicrosoft()" class="px-3 py-1.5 rounded-lg bg-cyan-600 text-white text-xs font-medium hover:bg-cyan-500">Sign In with Microsoft</button>
             </div>
-            <h3 class="text-lg font-bold text-slate-100">Sign In to Add Places</h3>
-            <p class="text-xs text-slate-400">You can explore the map freely, but you must sign in with a Microsoft account to add new landmarks.</p>
-            <button onclick="loginWithMicrosoft()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-                <i class="fa-brands fa-microsoft"></i> Sign In with Microsoft
-            </button>
         </div>
     </div>
 
-    <!-- ADD NEW PLACE MODAL -->
-    <div id="add-place-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-3 overflow-y-auto max-h-[90vh]">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="font-bold text-slate-100 flex items-center gap-2"><i class="fa-solid fa-circle-plus text-cyan-400"></i> Add New Landmark</h3>
-                <button onclick="closeAddModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form onsubmit="addNewPlace(event)" class="space-y-3">
+    <!-- Add Place Modal -->
+    <div id="add-place-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-md w-full space-y-4">
+            <h3 class="text-base font-bold text-slate-100">Add New Landmark</h3>
+            <form onsubmit="addNewPlace(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="text-[11px] font-semibold text-slate-400">Landmark Name *</label>
-                    <input type="text" id="add-name" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    <label class="block text-slate-400 mb-1">Name</label>
+                    <input type="text" id="add-name" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200">
                 </div>
                 <div>
-                    <label class="text-[11px] font-semibold text-slate-400">Category *</label>
-                    <select id="add-category" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
-                        <option value="sight">Sightseeing</option>
-                        <option value="snack">Snacks & Coffee</option>
+                    <label class="block text-slate-400 mb-1">Category</label>
+                    <select id="add-category" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200">
+                        <option value="sight">Sight</option>
+                        <option value="snack">Snack & Food</option>
                     </select>
                 </div>
                 <div>
-                    <label class="text-[11px] font-semibold text-slate-400">Upload Image</label>
-                    <div class="flex gap-2 mt-1">
-                        <input type="url" id="add-img" placeholder="https://..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
-                        <label class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 text-xs px-3 py-2 rounded-lg cursor-pointer shrink-0">
-                            <i class="fa-solid fa-upload"></i> Browse...
-                            <input type="file" accept="image/*" onchange="handleFileUpload(event, 'add-img')" class="hidden">
-                        </label>
-                    </div>
-                </div>
-                <div>
-                    <label class="text-[11px] font-semibold text-slate-400">Address *</label>
-                    <input type="text" id="add-address" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    <label class="block text-slate-400 mb-1">Address</label>
+                    <input type="text" id="add-address" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="text-[11px] font-semibold text-slate-400">Latitude</label>
-                        <input type="number" id="add-lat" step="any" value="63.7467" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                        <label class="block text-slate-400 mb-1">Latitude</label>
+                        <input type="number" step="any" id="add-lat" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200">
                     </div>
                     <div>
-                        <label class="text-[11px] font-semibold text-slate-400">Longitude</label>
-                        <input type="number" id="add-lng" step="any" value="-68.5170" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                        <label class="block text-slate-400 mb-1">Longitude</label>
+                        <input type="number" step="any" id="add-lng" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-lg mt-2">Save Location</button>
+                <div>
+                    <label class="block text-slate-400 mb-1">Image URL</label>
+                    <input type="url" id="add-img" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200">
+                    <p class="text-[10px] text-slate-500 mt-1">Or upload an image file:</p>
+                    <input type="file" accept="image/*" onchange="handleFileUpload(event, 'add-img')" class="mt-1 text-slate-400 text-[10px]">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeAddModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium hover:bg-slate-700">Cancel</button>
+                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-cyan-600 text-white text-xs font-medium hover:bg-cyan-500">Save Place</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- CHANGE IMAGE MODAL -->
-    <div id="change-image-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 relative">
-            <button onclick="closeChangeImageModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            <h3 class="font-bold text-slate-100 flex items-center gap-2"><i class="fa-solid fa-image text-cyan-400"></i> Change Image (Free)</h3>
-            <div class="space-y-3">
+    <!-- Change Image Modal -->
+    <div id="change-image-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-sm w-full space-y-4">
+            <h3 class="text-base font-bold text-slate-100">Update Photo</h3>
+            <div class="space-y-3 text-xs">
                 <div>
-                    <label class="text-[11px] font-semibold text-slate-400">Image URL</label>
-                    <input type="url" id="modal-image-url" placeholder="https://..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 mt-1">
+                    <label class="block text-slate-400 mb-1">Image URL</label>
+                    <input type="url" id="modal-image-url" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200">
                 </div>
-                <div class="text-center text-xs text-slate-500 font-semibold">- OR -</div>
-                <button onclick="document.getElementById('change-image-file-input').click()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 font-semibold text-xs py-2 rounded-xl transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-upload"></i> Upload Image File
-                </button>
-                <button onclick="saveImageChangeFromModal()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-lg mt-2">Save New Picture</button>
+                <div>
+                    <label class="block text-slate-400 mb-1">Upload File</label>
+                    <input type="file" accept="image/*" onchange="processImageFileChange(event)" class="w-full text-slate-400 text-[10px]">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeChangeImageModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium hover:bg-slate-700">Cancel</button>
+                <button onclick="saveImageChangeFromModal()" class="px-3 py-1.5 rounded-lg bg-cyan-600 text-white text-xs font-medium hover:bg-cyan-500">Update</button>
             </div>
         </div>
     </div>
 
-    <!-- JS LOGIC -->
+    <!-- JavaScript logic -->
     <script>
         const msalConfig = {
             auth: {
@@ -247,7 +175,7 @@
             shadowSize: [41, 41]
         });
 
-        // Default landmarks with category tags
+        // Default landmarks array
         const defaultLandmarks = [
             {
                 id: 1,
@@ -256,9 +184,9 @@
                 address: "Building 756, Iqaluit, NU",
                 lat: 63.7461,
                 lng: -68.5173,
-                img: "https://scontent-yyz1-1.xx.fbcdn.net/v/t39.30808-6/276319784_634704957765624_8097329916999291241_n.png?stp=dst-png&cstp=mx254x254&ctp=s254x254&_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=goX8q2yiRFUQ7kNvwGtMKxk&_nc_oc=Adr7wXcR82JehQBvcYPUr54yuRP0Z8YPZBqV3uQAzngIuTq4JmbHqvzphY8DiqubSk0KTKa9AMQXlsWYD4WX5W8n&_nc_zt=23&_nc_ht=scontent-yyz1-1.xx&_nc_gid=tmKZUmvCrzuVMLBAKBuRzQ&_nc_ss=7b2a8&oh=00_AQOeCglBz1B60jaK9vxenSk3W_XZQL4jMuxVMGu1JobnEw&oe=6AC78ABC"
-                note: "We are hard-working, thirsty folk with big hearts...they just happen to be black."
-                officialLinks: "http://www.facebook.com/BlackHeartCafe/"
+                img: "https://scontent-yyz1-1.xx.fbcdn.net/v/t39.30808-6/276319784_634704957765624_8097329916999291241_n.png?stp=dst-png&cstp=mx254x254&ctp=s254x254&_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=goX8q2yiRFUQ7kNvwGtMKxk&_nc_oc=Adr7wXcR82JehQBvcYPUr54yuRP0Z8YPZBqV3uQAzngIuTq4JmbHqvzphY8DiqubSk0KTKa9AMQXlsWYD4WX5W8n&_nc_zt=23&_nc_ht=scontent-yyz1-1.xx&_nc_gid=tmKZUmvCrzuVMLBAKBuRzQ&_nc_ss=7b2a8&oh=00_AQOeCglBz1B60jaK9vxenSk3W_XZQL4jMuxVMGu1JobnEw&oe=6AC78ABC",
+                note: "We are hard-working, thirsty folk with big hearts...they just happen to be black.",
+                officialLink: "http://www.facebook.com/BlackHeartCafe/"
             },
             {
                 id: 2,
@@ -267,9 +195,9 @@
                 address: "Astro Hill Complex, Iqaluit, NU",
                 lat: 63.7475,
                 lng: -68.5141,
-                img: "https://www.frobisherinn.com/files/4527/frobisher_inn_colour.png"
-                note: "Opposites attract at Frobisher Inn. Days are full with Iqaluit’s adventure, while nights are complete with the calm of home. Enjoy the outdoor adventures in the crisp air with a trail hike, snowmobile ride or a watery swoosh of a kayak blade. Or play it cool exploring Inuit artisans, landmarks, or in-town cultural events. Either way, count on the warmth of the Frobisher Inn when your day's adventures are complete. In our Northern Iqaluit hotel, gourmet dining meets rustic luxury, meets clean lines, and meets boundless hospitality. Welcome to our Northern paradise, where adventures meet."
-                officialLinks: "https://www.frobisherinn.com/"
+                img: "https://www.frobisherinn.com/files/4527/frobisher_inn_colour.png",
+                note: "Opposites attract at Frobisher Inn. Days are full with Iqaluit’s adventure, while nights are complete with the calm of home. Enjoy the outdoor adventures in the crisp air with a trail hike, snowmobile ride or a watery swoosh of a kayak blade.",
+                officialLink: "https://www.frobisherinn.com/"
             },
             {
                 id: 3,
@@ -278,9 +206,9 @@
                 address: "Astro Hill Complex, Iqaluit, NU",
                 lat: 63.7478,
                 lng: -68.5144,
-                img: "https://astrotheatre.ca/wp-content/uploads/2014/05/AstroTheatre-Logo_blue_web_phone_403px-4.png"
-                note: "The Astro Hill Complex is a four building structure in Iqaluit, Nunavut, Canada, and includes the W. G. Brown Building, the Frobisher Inn hotel and two apartment buildings. The Astro Hill Complex has the largest and among the tallest buildings in the capital city including the tallest with a floor count of 8."
-                officialLinks: "https://astrotheatre.ca/"
+                img: "https://astrotheatre.ca/wp-content/uploads/2014/05/AstroTheatre-Logo_blue_web_phone_403px-4.png",
+                note: "The Astro Hill Complex is a four building structure in Iqaluit, Nunavut, Canada, and includes the W. G. Brown Building, the Frobisher Inn hotel and two apartment buildings.",
+                officialLink: "https://astrotheatre.ca/"
             },
             {
                 id: 4,
@@ -298,7 +226,7 @@
                 address: "Aqqaluk Rd, Iqaluit, NU",
                 lat: 63.7481,
                 lng: -68.5189,
-                img: "https://northmart.ca/wp-content/uploads/2025/03/ncr_brandHead.svg"
+                img: "https://northmart.ca/wp-content/uploads/2025/03/ncr_brandHead.svg",
                 officialLink: "https://northmart.ca/"
             },
             {
@@ -308,8 +236,8 @@
                 address: "926 Unikkaarvik Rd",
                 lat: 63.7495,
                 lng: -68.5162,
-                img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9"
-                officialLinks: "http://www.assembly.nu.ca/"
+                img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9",
+                officialLink: "http://www.assembly.nu.ca/"
             },
             {
                 id: 7,
@@ -318,7 +246,7 @@
                 address: "220 Unikkaarvik Rd",
                 lat: 63.7438,
                 lng: -68.5150,
-                img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1"
+                img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1",
                 officialLink: "https://www.facebook.com/Unikkaarvik/"
             },
             {
@@ -329,7 +257,7 @@
                 lat: 63.7463,
                 lng: -68.5147,
                 img: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092",
-                note: "St. Jude's Cathedral is the Anglican cathedral in Iqaluit, Nunavut, Canada. The cathedral is the seat of the Diocese of The Arctic, which covers the Northwest Territories, Nunavut, and the Nunavik region of Northern Quebec.",
+                note: "St. Jude's Cathedral is the Anglican cathedral in Iqaluit, Nunavut, Canada. The cathedral is the seat of the Diocese of The Arctic.",
                 officialLink: "https://iqaluitcathedral.ca/"
             },
             {
@@ -380,7 +308,21 @@
             }
         ];
 
-        let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
+        // Ensure fresh data is pulled if default dynamic structure changes
+        let storedData = localStorage.getItem('iqaluit_landmarks');
+        let landmarks = defaultLandmarks;
+
+        if (storedData) {
+            try {
+                const parsed = JSON.parse(storedData);
+                // Simple validation check: if stored items don't have new properties, default to original
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    landmarks = parsed;
+                }
+            } catch(e) {
+                landmarks = defaultLandmarks;
+            }
+        }
 
         msalInstance.initialize().then(() => {
             const accounts = msalInstance.getAllAccounts();
@@ -560,6 +502,8 @@
                 card.onclick = () => focusLandmark(place.id);
 
                 let linksHTML = '';
+                const mainLink = place.officialLink || place.officialLinks;
+
                 if (place.airportLinks) {
                     linksHTML = `
                         <div class="mt-2 flex gap-2">
@@ -567,10 +511,10 @@
                             <a href="${place.airportLinks.airline}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-sky-900/60 text-sky-300 border border-sky-700/50 px-2 py-0.5 rounded hover:bg-sky-800 transition">Canadian North</a>
                         </div>
                     `;
-                } else if (place.officialLink) {
+                } else if (mainLink) {
                     linksHTML = `
                         <div class="mt-2 flex gap-2">
-                            <a href="${place.officialLink}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-cyan-900/60 text-cyan-300 border border-cyan-700/50 px-2 py-0.5 rounded hover:bg-cyan-800 transition">Official Site</a>
+                            <a href="${mainLink}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-cyan-900/60 text-cyan-300 border border-cyan-700/50 px-2 py-0.5 rounded hover:bg-cyan-800 transition">Official Site</a>
                         </div>
                     `;
                 }
