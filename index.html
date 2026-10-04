@@ -1,610 +1,612 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <meta name="google-site-verification" content="YZ4j7urjkTDUD1dgqrWZSp2m0YSa3E9QcQ3Exyy09RE" />
-   <title>Iqaluit Landmark Explorer - Interactive Map</title>
-   <!-- Tailwind CSS -->
-   <script src="https://cdn.tailwindcss.com"></script>
-   <!-- Leaflet CSS -->
-   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-   <!-- Leaflet JS -->
-   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-   <!-- FontAwesome Icons -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   <!-- Inter Font -->
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-   <!-- MSAL.js Browser SDK for Microsoft Auth -->
-   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="YZ4j7urjkTDUD1dgqrWZSp2m0YSa3E9QcQ3Exyy09RE" />
+    <title>Iqaluit Landmark Explorer - Interactive Map</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MSAL.js Browser SDK for Microsoft Auth -->
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 
-   <script>
-       tailwind.config = {
-           darkMode: 'class',
-           theme: {
-               extend: {
-                   colors: {
-                       arctic: {
-                           50: '#f0f9ff',
-                           100: '#e0f2fe',
-                           200: '#bae6fd',
-                           500: '#0284c7',
-                           800: '#075985',
-                           900: '#0c4a6e',
-                           950: '#082f49',
-                       }
-                   },
-                   fontFamily: {
-                       sans: ['Inter', 'sans-serif'],
-                   }
-               }
-           }
-       }
-   </script>
-   <style>
-       body { font-family: 'Inter', sans-serif; }
-       #map { width: 100%; height: 100%; z-index: 1; }
-       .leaflet-popup-content-wrapper {
-           background: rgba(15, 23, 42, 0.95);
-           backdrop-filter: blur(12px);
-           color: #f8fafc;
-           border: 1px solid rgba(56, 189, 248, 0.3);
-           border-radius: 1rem;
-           box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-           padding: 4px;
-       }
-       .leaflet-popup-tip {
-           background: rgba(15, 23, 42, 0.95);
-           border: 1px solid rgba(56, 189, 248, 0.3);
-       }
-       .leaflet-popup-content { margin: 12px 14px; line-height: 1.5; }
-       ::-webkit-scrollbar { width: 6px; height: 6px; }
-       ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-       ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.4); border-radius: 3px; }
-       ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.7); }
-   </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        arctic: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            500: '#0284c7',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            950: '#082f49',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        #map { width: 100%; height: 100%; z-index: 1; }
+        .leaflet-popup-content-wrapper {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            color: #f8fafc;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+            padding: 4px;
+        }
+        .leaflet-popup-tip {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        .leaflet-popup-content { margin: 12px 14px; line-height: 1.5; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.4); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.7); }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 h-full flex flex-col overflow-hidden select-none">
 
-   <!-- Hidden File Input for Direct Local Image Selection without Sign-In -->
-   <input type="file" id="change-image-file-input" accept="image/*" class="hidden" onchange="processImageFileChange(event)">
+    <!-- Hidden File Input for Direct Local Image Selection without Sign-In -->
+    <input type="file" id="change-image-file-input" accept="image/*" class="hidden" onchange="processImageFileChange(event)">
 
-   <!-- Top Navigation Header -->
-   <header class="h-16 bg-slate-900/90 border-b border-slate-800 backdrop-blur-md px-4 flex items-center justify-between z-20 shrink-0">
-       <div class="flex items-center space-x-3">
-           <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-sky-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-               <i class="fa-solid fa-compass text-slate-950 text-xl"></i>
-           </div>
-           <div>
-               <h1 class="font-bold text-lg text-slate-100 leading-tight flex items-center gap-2">
-                   Iqaluit Landmark Explorer
-                   <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/50">ᐃᖃᓗᐃᑦ</span>
-               </h1>
-               <p class="text-xs text-slate-400 flex items-center gap-2">
-                   <span><i class="fa-solid fa-map-pin text-cyan-400 text-[10px]"></i> Nunavut, Canada</span>
-               </p>
-           </div>
-       </div>
+    <!-- Top Navigation Header -->
+    <header class="h-16 bg-slate-900/90 border-b border-slate-800 backdrop-blur-md px-4 flex items-center justify-between z-20 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-sky-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-compass text-slate-950 text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg text-slate-100 leading-tight flex items-center gap-2">
+                    Iqaluit Landmark Explorer
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/50">ᐃᖃᓗᐃᑦ</span>
+                </h1>
+                <p class="text-xs text-slate-400 flex items-center gap-2">
+                    <span><i class="fa-solid fa-map-pin text-cyan-400 text-[10px]"></i> Nunavut, Canada</span>
+                </p>
+            </div>
+        </div>
 
-       <div class="flex items-center gap-2">
-           <button onclick="handleAddPlaceClick()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl border border-cyan-400/30 transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
-               <i class="fa-solid fa-plus text-sm"></i>
-               <span class="hidden sm:inline">Add Place</span>
-           </button>
+        <div class="flex items-center gap-2">
+            <button onclick="handleAddPlaceClick()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl border border-cyan-400/30 transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
+                <i class="fa-solid fa-plus text-sm"></i>
+                <span class="hidden sm:inline">Add Place</span>
+            </button>
 
-           <button id="auth-btn" onclick="handleAuthClick()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
-               <i class="fa-brands fa-microsoft text-sky-400 text-sm"></i>
-               <span id="auth-user-label" class="hidden sm:inline">Sign In</span>
-           </button>
-       </div>
-   </header>
+            <button id="auth-btn" onclick="handleAuthClick()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium px-3.5 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                <i class="fa-brands fa-microsoft text-sky-400 text-sm"></i>
+                <span id="auth-user-label" class="hidden sm:inline">Sign In</span>
+            </button>
+        </div>
+    </header>
 
-   <!-- Main Map Workspace -->
-   <div class="flex-1 flex relative overflow-hidden">
-       <aside id="sidebar" class="w-full md:w-96 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 flex flex-col z-10">
-           <div class="p-4 border-b border-slate-800 space-y-3">
-               <input type="text" id="search-input" onkeyup="filterLandmarks()" placeholder="Search landmarks..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+    <!-- Main Map Workspace -->
+    <div class="flex-1 flex relative overflow-hidden">
+        <aside id="sidebar" class="w-full md:w-96 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 flex flex-col z-10">
+            <div class="p-4 border-b border-slate-800 space-y-3">
+                <input type="text" id="search-input" onkeyup="filterLandmarks()" placeholder="Search landmarks..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
 
-               <!-- Category Filter Tabs -->
-               <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs">
-                   <button onclick="setCategoryFilter('all')" id="tab-all" class="filter-tab px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-medium shrink-0 transition">
-                       <i class="fa-solid fa-border-all mr-1"></i> All
-                   </button>
-                   <button onclick="setCategoryFilter('snack')" id="tab-snack" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition">
-                       <i class="fa-solid fa-mug-hot mr-1 text-amber-400"></i> Snacks & Coffee
-                   </button>
-                   <button onclick="setCategoryFilter('sight')" id="tab-sight" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition">
-                       <i class="fa-solid fa-camera mr-1 text-cyan-400"></i> Sights
-                   </button>
-               </div>
-           </div>
-           <div class="flex-1 overflow-y-auto p-4 space-y-3" id="landmark-list"></div>
-       </aside>
+                <!-- Category Filter Tabs -->
+                <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs">
+                    <button onclick="setCategoryFilter('all')" id="tab-all" class="filter-tab px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-medium shrink-0 transition">
+                        <i class="fa-solid fa-border-all mr-1"></i> All
+                    </button>
+                    <button onclick="setCategoryFilter('snack')" id="tab-snack" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition">
+                        <i class="fa-solid fa-mug-hot mr-1 text-amber-400"></i> Snacks & Coffee
+                    </button>
+                    <button onclick="setCategoryFilter('sight')" id="tab-sight" class="filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition">
+                        <i class="fa-solid fa-camera mr-1 text-cyan-400"></i> Sights
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-3" id="landmark-list"></div>
+        </aside>
 
-       <main class="flex-1 relative">
-           <div id="map"></div>
-       </main>
-   </div>
+        <main class="flex-1 relative">
+            <div id="map"></div>
+        </main>
+    </div>
 
-   <!-- AUTH MODAL -->
-   <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-       <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 relative text-center">
-           <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-           <div class="w-12 h-12 rounded-2xl bg-cyan-950 border border-cyan-700 flex items-center justify-center text-cyan-400 text-xl mx-auto mb-2">
-               <i class="fa-brands fa-microsoft"></i>
-           </div>
-           <h3 class="text-lg font-bold text-slate-100">Sign In to Add Places</h3>
-           <p class="text-xs text-slate-400">You can explore the map freely, but you must sign in with a Microsoft account to add new landmarks.</p>
-           <button onclick="loginWithMicrosoft()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-               <i class="fa-brands fa-microsoft"></i> Sign In with Microsoft
-           </button>
-       </div>
-   </div>
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 relative text-center">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="w-12 h-12 rounded-2xl bg-cyan-950 border border-cyan-700 flex items-center justify-center text-cyan-400 text-xl mx-auto mb-2">
+                <i class="fa-brands fa-microsoft"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-100">Sign In to Add Places</h3>
+            <p class="text-xs text-slate-400">You can explore the map freely, but you must sign in with a Microsoft account to add new landmarks.</p>
+            <button onclick="loginWithMicrosoft()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fa-brands fa-microsoft"></i> Sign In with Microsoft
+            </button>
+        </div>
+    </div>
 
-   <!-- ADD NEW PLACE MODAL -->
-   <div id="add-place-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-       <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-3 overflow-y-auto max-h-[90vh]">
-           <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-               <h3 class="font-bold text-slate-100 flex items-center gap-2"><i class="fa-solid fa-circle-plus text-cyan-400"></i> Add New Landmark</h3>
-               <button onclick="closeAddModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-           </div>
-           <form onsubmit="addNewPlace(event)" class="space-y-3">
-               <div>
-                   <label class="text-[11px] font-semibold text-slate-400">Landmark Name *</label>
-                   <input type="text" id="add-name" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
-               </div>
-               <div>
-                   <label class="text-[11px] font-semibold text-slate-400">Category *</label>
-                   <select id="add-category" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
-                       <option value="sight">Sightseeing</option>
-                       <option value="snack">Snacks & Coffee</option>
-                   </select>
-               </div>
-               <div>
-                   <label class="text-[11px] font-semibold text-slate-400">Upload Image</label>
-                   <div class="flex gap-2 mt-1">
-                       <input type="url" id="add-img" placeholder="https://..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
-                       <label class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 text-xs px-3 py-2 rounded-lg cursor-pointer shrink-0">
-                           <i class="fa-solid fa-upload"></i> Browse...
-                           <input type="file" accept="image/*" onchange="handleFileUpload(event, 'add-img')" class="hidden">
-                       </label>
-                   </div>
-               </div>
-               <div>
-                   <label class="text-[11px] font-semibold text-slate-400">Address *</label>
-                   <input type="text" id="add-address" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
-               </div>
-               <div class="grid grid-cols-2 gap-2">
-                   <div>
-                       <label class="text-[11px] font-semibold text-slate-400">Latitude</label>
-                       <input type="number" id="add-lat" step="any" value="63.7467" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
-                   </div>
-                   <div>
-                       <label class="text-[11px] font-semibold text-slate-400">Longitude</label>
-                       <input type="number" id="add-lng" step="any" value="-68.5170" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
-                   </div>
-               </div>
-               <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-lg mt-2">Save Location</button>
-           </form>
-       </div>
-   </div>
+    <!-- ADD NEW PLACE MODAL -->
+    <div id="add-place-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-3 overflow-y-auto max-h-[90vh]">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-slate-100 flex items-center gap-2"><i class="fa-solid fa-circle-plus text-cyan-400"></i> Add New Landmark</h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="addNewPlace(event)" class="space-y-3">
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Landmark Name *</label>
+                    <input type="text" id="add-name" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Category *</label>
+                    <select id="add-category" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                        <option value="sight">Sightseeing</option>
+                        <option value="snack">Snacks & Coffee</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Upload Image</label>
+                    <div class="flex gap-2 mt-1">
+                        <input type="url" id="add-img" placeholder="https://..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                        <label class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 text-xs px-3 py-2 rounded-lg cursor-pointer shrink-0">
+                            <i class="fa-solid fa-upload"></i> Browse...
+                            <input type="file" accept="image/*" onchange="handleFileUpload(event, 'add-img')" class="hidden">
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Address *</label>
+                    <input type="text" id="add-address" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Latitude</label>
+                        <input type="number" id="add-lat" step="any" value="63.7467" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-400">Longitude</label>
+                        <input type="number" id="add-lng" step="any" value="-68.5170" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-lg mt-2">Save Location</button>
+            </form>
+        </div>
+    </div>
 
-   <!-- CHANGE IMAGE MODAL (Free, No Sign-In Required) -->
-   <div id="change-image-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-       <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 relative">
-           <button onclick="closeChangeImageModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-           <h3 class="font-bold text-slate-100 flex items-center gap-2"><i class="fa-solid fa-image text-cyan-400"></i> Change Image (Free)</h3>
-           <div class="space-y-3">
-               <div>
-                   <label class="text-[11px] font-semibold text-slate-400">Image URL</label>
-                   <input type="url" id="modal-image-url" placeholder="https://..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 mt-1">
-               </div>
-               <div class="text-center text-xs text-slate-500 font-semibold">- OR -</div>
-               <button onclick="document.getElementById('change-image-file-input').click()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 font-semibold text-xs py-2 rounded-xl transition flex items-center justify-center gap-2">
-                   <i class="fa-solid fa-upload"></i> Upload Image File
-               </button>
-               <button onclick="saveImageChangeFromModal()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-lg mt-2">Save New Picture</button>
-           </div>
-       </div>
-   </div>
+    <!-- CHANGE IMAGE MODAL -->
+    <div id="change-image-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 relative">
+            <button onclick="closeChangeImageModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="font-bold text-slate-100 flex items-center gap-2"><i class="fa-solid fa-image text-cyan-400"></i> Change Image (Free)</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400">Image URL</label>
+                    <input type="url" id="modal-image-url" placeholder="https://..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 mt-1">
+                </div>
+                <div class="text-center text-xs text-slate-500 font-semibold">- OR -</div>
+                <button onclick="document.getElementById('change-image-file-input').click()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 font-semibold text-xs py-2 rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-upload"></i> Upload Image File
+                </button>
+                <button onclick="saveImageChangeFromModal()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-lg mt-2">Save New Picture</button>
+            </div>
+        </div>
+    </div>
 
-   <!-- JS LOGIC -->
-   <script>
-       const msalConfig = {
-           auth: {
-               clientId: "a2335a85-a5ec-4061-97f9-4e1807b76793",
-               authority: "https://login.microsoftonline.com/common",
-               redirectUri: "https://noodledanny00.github.io/iqaluitlandmarks/"
-           },
-           cache: { cacheLocation: "localStorage" }
-       };
+    <!-- JS LOGIC -->
+    <script>
+        const msalConfig = {
+            auth: {
+                clientId: "a2335a85-a5ec-4061-97f9-4e1807b76793",
+                authority: "https://login.microsoftonline.com/common",
+                redirectUri: "https://noodledanny00.github.io/iqaluitlandmarks/"
+            },
+            cache: { cacheLocation: "localStorage" }
+        };
 
-       const msalInstance = new msal.PublicClientApplication(msalConfig);
-       let currentUser = null;
-       let markersGroup = [];
-       let activeMarker = null;
-       let currentCategory = 'all';
-       let targetLandmarkIdForImage = null;
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+        let currentUser = null;
+        let markersGroup = [];
+        let activeMarker = null;
+        let currentCategory = 'all';
+        let targetLandmarkIdForImage = null;
 
-       // Pin Icons
-       const defaultIcon = L.icon({
-           iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-           shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-           iconSize: [25, 41],
-           iconAnchor: [12, 41],
-           popupAnchor: [1, -34],
-           shadowSize: [41, 41]
-       });
+        // Pin Icons
+        const defaultIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
 
-       const selectedIcon = L.icon({
-           iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-           shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-           iconSize: [25, 41],
-           iconAnchor: [12, 41],
-           popupAnchor: [1, -34],
-           shadowSize: [41, 41]
-       });
+        const selectedIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
 
-       // Default landmarks with category tags
-       const defaultLandmarks = [
-  {
-    id: 1,
-    name: "Black Heart Café",
-    category: "snack",
-    address: "Building 756, Iqaluit, NU",
-    lat: 63.7461,
-    lng: -68.5173,
-    img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb"
-  },
-  {
-    id: 2,
-    name: "Frobisher Inn",
-    category: "snack",
-    address: "Astro Hill Complex, Iqaluit, NU",
-    lat: 63.7475,
-    lng: -68.5141,
-    img: "https://images.unsplash.com/photo-1566073771259-6a8506099945"
-  },
-  {
-    id: 3,
-    name: "Astro Theatre",
-    category: "sight",
-    address: "Astro Hill Complex, Iqaluit, NU",
-    lat: 63.7478,
-    lng: -68.5144,
-    img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba"
-  },
-  {
-    id: 4,
-    name: "CBC Nunavut",
-    category: "sight",
-    address: "Building 224, Iqaluit, NU",
-    lat: 63.7452,
-    lng: -68.5155,
-    img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167"
-  },
-  {
-    id: 5,
-    name: "Northmart",
-    category: "snack",
-    address: "Aqqaluk Rd, Iqaluit, NU",
-    lat: 63.7481,
-    lng: -68.5189,
-    img: "https://images.unsplash.com/photo-1578916171728-46686eac8d58"
-  },
-  {
-    id: 6,
-    name: "Legislative Assembly of Nunavut",
-    category: "sight",
-    address: "926 Unikkaarvik Rd",
-    lat: 63.7495,
-    lng: -68.5162,
-    img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9"
-  },
-  {
-    id: 7,
-    name: "Unikkaarvik Visitor Centre",
-    category: "sight",
-    address: "220 Unikkaarvik Rd",
-    lat: 63.7438,
-    lng: -68.5150,
-    img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1"
-  },
-  {
-    id: 8,
-    name: "St. Jude's Anglican Cathedral",
-    category: "sight",
-    address: "Mattaaq St",
-    lat: 63.7463,
-    lng: -68.5147,
-    img: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092"
-    note: "St. Jude's Cathedral is the Anglican cathedral in Iqaluit, Nunavut, Canada. The cathedral is the seat of the Diocese of The Arctic, which covers the Northwest Territories, Nunavut, and the Nunavik region of Northern Quebec. It has the greatest area of any Anglican diocese in the world."
-    officialLink: "https://iqaluitcathedral.ca/"
-  },
-  {
-    id: 9,
-    name: "Akausisarvik Mental Health Facility",
-    category: "sight",
-    address: "503 Niaqunngusiariaq, Iqaluit, NU",
-    lat: 63.7505,
-    lng: -68.5080,
-    img: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d"
-    note: "Inuksuk High School is the high school of Iqaluit, the capital of the Canadian territory of Nunavut."
-    officialLink: "https://www.facebook.com/inuksukhighschool/"
-  },
-  {
-    id: 10,
-    name: "Inuksuk High School",
-    category: "sight",
-    address: "501 Niaqunngusiariaq, Iqaluit, NU",
-    lat: 63.7492,
-    lng: -68.5139,
-    img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Inuksuk_High_School.jpg/1280px-Inuksuk_High_School.jpg?utm_source=en.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
-  },
-  {
-    id: 11,
-    name: "Stay By The Sea",
-    category: "sight",
-    address: "2536 Paurngaq, Iqaluit, NU",
-    lat: 63.7402,
-    lng: -68.5125,
-    img: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
-    note: "Stay By The Sea is a 2-story boutique retreat and B&B located on a scenic hillside overlooking Frobisher Bay in Iqaluit, Nunavut",
-    officialLink: "https://www.staybythesea.ca/"
-  },
-  {
-    id: 12,
-    name: "Iqaluit International Airport",
-    category: "sight",
-    address: "Airport Rd, Iqaluit, NU",
-    lat: 63.7564,
-    lng: -68.5559,
-    img: "https://www.iqaluitairport.ca/sites/default/files/styles/header/public/2025-06/YFB-Terminal%20airside_header.jpg?itok=AJYII8Yy",
-    note: "Iqaluit international airport is a great place to book flights and see many great workers. Maybe you can book the next trip to Iqaluit!",
-    airportLinks: {
-      official: "https://www.iqaluitairport.ca/",
-      airline: "https://canadiannorth.com/"
-    }
-  }
-];
-       let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
+        // Default landmarks with category tags
+        const defaultLandmarks = [
+            {
+                id: 1,
+                name: "Black Heart Café",
+                category: "snack",
+                address: "Building 756, Iqaluit, NU",
+                lat: 63.7461,
+                lng: -68.5173,
+                img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb"
+            },
+            {
+                id: 2,
+                name: "Frobisher Inn",
+                category: "snack",
+                address: "Astro Hill Complex, Iqaluit, NU",
+                lat: 63.7475,
+                lng: -68.5141,
+                img: "https://images.unsplash.com/photo-1566073771259-6a8506099945"
+            },
+            {
+                id: 3,
+                name: "Astro Theatre",
+                category: "sight",
+                address: "Astro Hill Complex, Iqaluit, NU",
+                lat: 63.7478,
+                lng: -68.5144,
+                img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba"
+            },
+            {
+                id: 4,
+                name: "CBC Nunavut",
+                category: "sight",
+                address: "Building 224, Iqaluit, NU",
+                lat: 63.7452,
+                lng: -68.5155,
+                img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167"
+            },
+            {
+                id: 5,
+                name: "Northmart",
+                category: "snack",
+                address: "Aqqaluk Rd, Iqaluit, NU",
+                lat: 63.7481,
+                lng: -68.5189,
+                img: "https://images.unsplash.com/photo-1578916171728-46686eac8d58"
+            },
+            {
+                id: 6,
+                name: "Legislative Assembly of Nunavut",
+                category: "sight",
+                address: "926 Unikkaarvik Rd",
+                lat: 63.7495,
+                lng: -68.5162,
+                img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9"
+            },
+            {
+                id: 7,
+                name: "Unikkaarvik Visitor Centre",
+                category: "sight",
+                address: "220 Unikkaarvik Rd",
+                lat: 63.7438,
+                lng: -68.5150,
+                img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1"
+            },
+            {
+                id: 8,
+                name: "St. Jude's Anglican Cathedral",
+                category: "sight",
+                address: "Mattaaq St",
+                lat: 63.7463,
+                lng: -68.5147,
+                img: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092",
+                note: "St. Jude's Cathedral is the Anglican cathedral in Iqaluit, Nunavut, Canada. The cathedral is the seat of the Diocese of The Arctic, which covers the Northwest Territories, Nunavut, and the Nunavik region of Northern Quebec.",
+                officialLink: "https://iqaluitcathedral.ca/"
+            },
+            {
+                id: 9,
+                name: "Akausisarvik Mental Health Facility",
+                category: "sight",
+                address: "503 Niaqunngusiariaq, Iqaluit, NU",
+                lat: 63.7505,
+                lng: -68.5080,
+                img: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d",
+                note: "Akausisarvik Mental Health Facility in Iqaluit provides essential community health and mental health support services."
+            },
+            {
+                id: 10,
+                name: "Inuksuk High School",
+                category: "sight",
+                address: "501 Niaqunngusiariaq, Iqaluit, NU",
+                lat: 63.7492,
+                lng: -68.5139,
+                img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b",
+                note: "Inuksuk High School is the high school of Iqaluit, the capital of the Canadian territory of Nunavut.",
+                officialLink: "https://www.facebook.com/inuksukhighschool/"
+            },
+            {
+                id: 11,
+                name: "Stay By The Sea",
+                category: "sight",
+                address: "2536 Paurngaq, Iqaluit, NU",
+                lat: 63.7402,
+                lng: -68.5125,
+                img: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+                note: "Stay By The Sea is a 2-story boutique retreat and B&B located on a scenic hillside overlooking Frobisher Bay in Iqaluit, Nunavut",
+                officialLink: "https://www.staybythesea.ca/"
+            },
+            {
+                id: 12,
+                name: "Iqaluit International Airport",
+                category: "sight",
+                address: "Airport Rd, Iqaluit, NU",
+                lat: 63.7564,
+                lng: -68.5559,
+                img: "https://www.iqaluitairport.ca/sites/default/files/styles/header/public/2025-06/YFB-Terminal%20airside_header.jpg?itok=AJYII8Yy",
+                note: "Iqaluit international airport is a great place to book flights and see many great workers. Maybe you can book the next trip to Iqaluit!",
+                airportLinks: {
+                    official: "https://www.iqaluitairport.ca/",
+                    airline: "https://canadiannorth.com/"
+                }
+            }
+        ];
 
-       msalInstance.initialize().then(() => {
-           const accounts = msalInstance.getAllAccounts();
-           if (accounts.length > 0) {
-               currentUser = accounts[0];
-           }
-           updateUIForUser();
-       });
+        let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
 
-       function handleAddPlaceClick() {
-           if (!currentUser) { openAuthModal(); } else { openAddModal(); }
-       }
+        msalInstance.initialize().then(() => {
+            const accounts = msalInstance.getAllAccounts();
+            if (accounts.length > 0) {
+                currentUser = accounts[0];
+            }
+            updateUIForUser();
+        });
 
-       function handleAuthClick() {
-           if (currentUser) {
-               msalInstance.logoutPopup().then(() => {
-                   currentUser = null;
-                   updateUIForUser();
-               });
-           } else {
-               loginWithMicrosoft();
-           }
-       }
+        function handleAddPlaceClick() {
+            if (!currentUser) { openAuthModal(); } else { openAddModal(); }
+        }
 
-       async function loginWithMicrosoft() {
-           try {
-               const loginResponse = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-               currentUser = loginResponse.account;
-               updateUIForUser();
-               closeAuthModal();
-               openAddModal();
-           } catch (error) {
-               console.error("Microsoft Login Error:", error);
-           }
-       }
+        function handleAuthClick() {
+            if (currentUser) {
+                msalInstance.logoutPopup().then(() => {
+                    currentUser = null;
+                    updateUIForUser();
+                });
+            } else {
+                loginWithMicrosoft();
+            }
+        }
 
-       function updateUIForUser() {
-           const authLabel = document.getElementById('auth-user-label');
-           authLabel.innerText = currentUser ? (currentUser.name || "Signed In") : "Sign In";
-       }
+        async function loginWithMicrosoft() {
+            try {
+                const loginResponse = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+                currentUser = loginResponse.account;
+                updateUIForUser();
+                closeAuthModal();
+                openAddModal();
+            } catch (error) {
+                console.error("Microsoft Login Error:", error);
+            }
+        }
 
-       function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
-       function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
-       function openAddModal() { document.getElementById('add-place-modal').classList.remove('hidden'); }
-       function closeAddModal() { document.getElementById('add-place-modal').classList.add('hidden'); }
+        function updateUIForUser() {
+            const authLabel = document.getElementById('auth-user-label');
+            authLabel.innerText = currentUser ? (currentUser.name || "Signed In") : "Sign In";
+        }
 
-       function triggerImageChange(landmarkId, event) {
-           if(event) event.stopPropagation();
-           targetLandmarkIdForImage = landmarkId;
-           document.getElementById('modal-image-url').value = '';
-           document.getElementById('change-image-modal').classList.remove('hidden');
-       }
+        function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
+        function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+        function openAddModal() { document.getElementById('add-place-modal').classList.remove('hidden'); }
+        function closeAddModal() { document.getElementById('add-place-modal').classList.add('hidden'); }
 
-       function closeChangeImageModal() {
-           document.getElementById('change-image-modal').classList.add('hidden');
-           targetLandmarkIdForImage = null;
-       }
+        function triggerImageChange(landmarkId, event) {
+            if(event) event.stopPropagation();
+            targetLandmarkIdForImage = landmarkId;
+            document.getElementById('modal-image-url').value = '';
+            document.getElementById('change-image-modal').classList.remove('hidden');
+        }
 
-       function saveImageChangeFromModal() {
-           const newUrl = document.getElementById('modal-image-url').value.trim();
-           if (newUrl && targetLandmarkIdForImage) {
-               updateLandmarkImage(targetLandmarkIdForImage, newUrl);
-               closeChangeImageModal();
-           }
-       }
+        function closeChangeImageModal() {
+            document.getElementById('change-image-modal').classList.add('hidden');
+            targetLandmarkIdForImage = null;
+        }
 
-       function processImageFileChange(event) {
-           const file = event.target.files[0];
-           if (file && targetLandmarkIdForImage) {
-               const reader = new FileReader();
-               reader.onload = function(e) {
-                   updateLandmarkImage(targetLandmarkIdForImage, e.target.result);
-                   closeChangeImageModal();
-               };
-               reader.readAsDataURL(file);
-           }
-           event.target.value = '';
-       }
+        function saveImageChangeFromModal() {
+            const newUrl = document.getElementById('modal-image-url').value.trim();
+            if (newUrl && targetLandmarkIdForImage) {
+                updateLandmarkImage(targetLandmarkIdForImage, newUrl);
+                closeChangeImageModal();
+            }
+        }
 
-       function updateLandmarkImage(landmarkId, newImgSrc) {
-           const place = landmarks.find(p => p.id === landmarkId);
-           if (place) {
-               place.img = newImgSrc;
-               saveLandmarksToStorage();
-               renderLandmarks();
-           }
-       }
+        function processImageFileChange(event) {
+            const file = event.target.files[0];
+            if (file && targetLandmarkIdForImage) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    updateLandmarkImage(targetLandmarkIdForImage, e.target.result);
+                    closeChangeImageModal();
+                };
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
+        }
 
-       function handleFileUpload(event, targetInputId) {
-           const file = event.target.files[0];
-           if (file) {
-               const reader = new FileReader();
-               reader.onload = function(e) {
-                   document.getElementById(targetInputId).value = e.target.result;
-               };
-               reader.readAsDataURL(file);
-           }
-       }
+        function updateLandmarkImage(landmarkId, newImgSrc) {
+            const place = landmarks.find(p => p.id === landmarkId);
+            if (place) {
+                place.img = newImgSrc;
+                saveLandmarksToStorage();
+                renderLandmarks();
+            }
+        }
 
-       // Initialize Map
-       const map = L.map('map').setView([63.7467, -68.5170], 13);
-       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        function handleFileUpload(event, targetInputId) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(targetInputId).value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
-       map.on('popupclose', () => {
-           if (activeMarker) {
-               activeMarker.setIcon(defaultIcon);
-               activeMarker = null;
-           }
-       });
+        // Initialize Map
+        const map = L.map('map').setView([63.7467, -68.5170], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-       function saveLandmarksToStorage() {
-           localStorage.setItem('iqaluit_landmarks', JSON.stringify(landmarks));
-       }
+        map.on('popupclose', () => {
+            if (activeMarker) {
+                activeMarker.setIcon(defaultIcon);
+                activeMarker = null;
+            }
+        });
 
-       function addNewPlace(event) {
-           event.preventDefault();
-           const newPlace = {
-               id: Date.now(),
-               name: document.getElementById('add-name').value,
-               category: document.getElementById('add-category').value,
-               img: document.getElementById('add-img').value || 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb',
-               address: document.getElementById('add-address').value,
-               lat: parseFloat(document.getElementById('add-lat').value),
-               lng: parseFloat(document.getElementById('add-lng').value)
-           };
-           landmarks.push(newPlace);
-           saveLandmarksToStorage();
-           closeAddModal();
-           renderLandmarks();
-       }
+        function saveLandmarksToStorage() {
+            localStorage.setItem('iqaluit_landmarks', JSON.stringify(landmarks));
+        }
 
-       function setCategoryFilter(category) {
-           currentCategory = category;
-           document.querySelectorAll('.filter-tab').forEach(btn => {
-               btn.className = "filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition";
-           });
-           const activeTab = document.getElementById(`tab-${category}`);
-           if (activeTab) {
-               activeTab.className = "filter-tab px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-medium shrink-0 transition";
-           }
-           renderLandmarks();
-       }
+        function addNewPlace(event) {
+            event.preventDefault();
+            const newPlace = {
+                id: Date.now(),
+                name: document.getElementById('add-name').value,
+                category: document.getElementById('add-category').value,
+                img: document.getElementById('add-img').value || 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb',
+                address: document.getElementById('add-address').value,
+                lat: parseFloat(document.getElementById('add-lat').value),
+                lng: parseFloat(document.getElementById('add-lng').value)
+            };
+            landmarks.push(newPlace);
+            saveLandmarksToStorage();
+            closeAddModal();
+            renderLandmarks();
+        }
 
-       function filterLandmarks() {
-           renderLandmarks();
-       }
+        function setCategoryFilter(category) {
+            currentCategory = category;
+            document.querySelectorAll('.filter-tab').forEach(btn => {
+                btn.className = "filter-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium shrink-0 transition";
+            });
+            const activeTab = document.getElementById(`tab-${category}`);
+            if (activeTab) {
+                activeTab.className = "filter-tab px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-medium shrink-0 transition";
+            }
+            renderLandmarks();
+        }
 
-       function focusLandmark(id) {
-           const place = landmarks.find(p => p.id === id);
-           if (place) {
-               map.setView([place.lat, place.lng], 15);
-               const marker = markersGroup.find(m => m.options.landmarkId === id);
-               if (marker) {
-                   marker.openPopup();
-               }
-           }
-       }
+        function filterLandmarks() {
+            renderLandmarks();
+        }
 
-       function renderLandmarks() {
-           const list = document.getElementById('landmark-list');
-           const searchQuery = (document.getElementById('search-input')?.value || '').toLowerCase();
-           list.innerHTML = '';
+        function focusLandmark(id) {
+            const place = landmarks.find(p => p.id === id);
+            if (place) {
+                map.setView([place.lat, place.lng], 15);
+                const marker = markersGroup.find(m => m.options.landmarkId === id);
+                if (marker) {
+                    marker.openPopup();
+                }
+            }
+        }
 
-           markersGroup.forEach(marker => map.removeLayer(marker));
-           markersGroup = [];
+        function renderLandmarks() {
+            const list = document.getElementById('landmark-list');
+            const searchQuery = (document.getElementById('search-input')?.value || '').toLowerCase();
+            list.innerHTML = '';
 
-           const filtered = landmarks.filter(place => {
-               const matchesCategory = currentCategory === 'all' || place.category === currentCategory;
-               const matchesSearch = place.name.toLowerCase().includes(searchQuery) || place.address.toLowerCase().includes(searchQuery);
-               return matchesCategory && matchesSearch;
-           });
+            markersGroup.forEach(marker => map.removeLayer(marker));
+            markersGroup = [];
 
-           filtered.forEach(place => {
-               // Add Card to Sidebar
-               const card = document.createElement('div');
-               card.className = "bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-xl p-3 flex gap-3 cursor-pointer transition";
-               card.onclick = () => focusLandmark(place.id);
+            const filtered = landmarks.filter(place => {
+                const matchesCategory = currentCategory === 'all' || place.category === currentCategory;
+                const matchesSearch = place.name.toLowerCase().includes(searchQuery) || place.address.toLowerCase().includes(searchQuery);
+                return matchesCategory && matchesSearch;
+            });
 
-               let linksHTML = '';
-               if (place.airportLinks) {
-                   linksHTML = `
-                       <div class="mt-2 flex gap-2">
-                           <a href="${place.airportLinks.official}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-cyan-900/60 text-cyan-300 border border-cyan-700/50 px-2 py-0.5 rounded hover:bg-cyan-800 transition">Official Site</a>
-                           <a href="${place.airportLinks.airline}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-sky-900/60 text-sky-300 border border-sky-700/50 px-2 py-0.5 rounded hover:bg-sky-800 transition">Canadian North</a>
-                       </div>
-                   `;
-               } else if (place.officialLink) {
-                   linksHTML = `
-                       <div class="mt-2 flex gap-2">
-                           <a href="${place.officialLink}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-cyan-900/60 text-cyan-300 border border-cyan-700/50 px-2 py-0.5 rounded hover:bg-cyan-800 transition">Official Site</a>
-                       </div>
-                   `;
-               }
+            filtered.forEach(place => {
+                // Add Card to Sidebar
+                const card = document.createElement('div');
+                card.className = "bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-xl p-3 flex gap-3 cursor-pointer transition";
+                card.onclick = () => focusLandmark(place.id);
 
-               card.innerHTML = `
-                   <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-900 shrink-0">
-                       <img src="${place.img}" alt="${place.name}" class="w-full h-full object-cover">
-                       <button onclick="triggerImageChange(${place.id}, event)" class="absolute bottom-1 right-1 bg-slate-950/80 text-cyan-400 p-1 rounded hover:text-white text-[10px]"><i class="fa-solid fa-camera"></i></button>
-                   </div>
-                   <div class="flex-1 min-w-0">
-                       <h4 class="font-semibold text-xs text-slate-100 truncate">${place.name}</h4>
-                       <p class="text-[11px] text-slate-400 truncate mt-0.5"><i class="fa-solid fa-location-dot text-cyan-400 text-[10px] mr-1"></i>${place.address}</p>
-                       ${place.note ? `<p class="text-[10px] text-slate-300 mt-1 line-clamp-2">${place.note}</p>` : ''}
-                       ${linksHTML}
-                   </div>
-               `;
-               list.appendChild(card);
+                let linksHTML = '';
+                if (place.airportLinks) {
+                    linksHTML = `
+                        <div class="mt-2 flex gap-2">
+                            <a href="${place.airportLinks.official}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-cyan-900/60 text-cyan-300 border border-cyan-700/50 px-2 py-0.5 rounded hover:bg-cyan-800 transition">Official Site</a>
+                            <a href="${place.airportLinks.airline}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-sky-900/60 text-sky-300 border border-sky-700/50 px-2 py-0.5 rounded hover:bg-sky-800 transition">Canadian North</a>
+                        </div>
+                    `;
+                } else if (place.officialLink) {
+                    linksHTML = `
+                        <div class="mt-2 flex gap-2">
+                            <a href="${place.officialLink}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-cyan-900/60 text-cyan-300 border border-cyan-700/50 px-2 py-0.5 rounded hover:bg-cyan-800 transition">Official Site</a>
+                        </div>
+                    `;
+                }
 
-               // Add Marker to Map
-               const marker = L.marker([place.lat, place.lng], { icon: defaultIcon, landmarkId: place.id }).addTo(map);
+                card.innerHTML = `
+                    <div class="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-900 shrink-0">
+                        <img src="${place.img}" alt="${place.name}" class="w-full h-full object-cover">
+                        <button onclick="triggerImageChange(${place.id}, event)" class="absolute bottom-1 right-1 bg-slate-950/80 text-cyan-400 p-1 rounded hover:text-white text-[10px]"><i class="fa-solid fa-camera"></i></button>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-semibold text-xs text-slate-100 truncate">${place.name}</h4>
+                        <p class="text-[11px] text-slate-400 truncate mt-0.5"><i class="fa-solid fa-location-dot text-cyan-400 text-[10px] mr-1"></i>${place.address}</p>
+                        ${place.note ? `<p class="text-[10px] text-slate-300 mt-1 line-clamp-2">${place.note}</p>` : ''}
+                        ${linksHTML}
+                    </div>
+                `;
+                list.appendChild(card);
 
-               let popupContent = `
-                   <div class="space-y-2 max-w-[200px]">
-                       <img src="${place.img}" class="w-full h-24 object-cover rounded-lg">
-                       <h4 class="font-bold text-sm text-slate-100">${place.name}</h4>
-                       <p class="text-xs text-slate-300">${place.address}</p>
-                       ${place.note ? `<p class="text-xs text-slate-400 italic">${place.note}</p>` : ''}
-                       ${linksHTML}
-                   </div>
-               `;
+                // Add Marker to Map
+                const marker = L.marker([place.lat, place.lng], { icon: defaultIcon, landmarkId: place.id }).addTo(map);
 
-               marker.bindPopup(popupContent);
+                let popupContent = `
+                    <div class="space-y-2 max-w-[200px]">
+                        <img src="${place.img}" class="w-full h-24 object-cover rounded-lg">
+                        <h4 class="font-bold text-sm text-slate-100">${place.name}</h4>
+                        <p class="text-xs text-slate-300">${place.address}</p>
+                        ${place.note ? `<p class="text-xs text-slate-400 italic">${place.note}</p>` : ''}
+                        ${linksHTML}
+                    </div>
+                `;
 
-               marker.on('click', () => {
-                   if (activeMarker) activeMarker.setIcon(defaultIcon);
-                   marker.setIcon(selectedIcon);
-                   activeMarker = marker;
-               });
+                marker.bindPopup(popupContent);
 
-               markersGroup.push(marker);
-           });
-       }
+                marker.on('click', () => {
+                    if (activeMarker) activeMarker.setIcon(defaultIcon);
+                    marker.setIcon(selectedIcon);
+                    activeMarker = marker;
+                });
 
-       // Initial render
-       renderLandmarks();
-   </script>
+                markersGroup.push(marker);
+            });
+        }
+
+        // Initial render
+        renderLandmarks();
+    </script>
 </body>
 </html>
