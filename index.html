@@ -196,191 +196,191 @@
             shadowSize: [41, 41]
         });
 
-const defaultLandmarks = [
-    {
-        id: 1,
-        name: "Black Heart Café",
-        category: "snack",
-        address: "Building 756, Iqaluit, NU",
-        lat: 63.7461,
-        lng: -68.5173,
-        img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24",
-        note: "We are hard-working, thirsty folk with big hearts...they just happen to be black.",
-        officialLink: "http://www.facebook.com/BlackHeartCafe/"
-    },
-    {
-        id: 2,
-        name: "Frobisher Inn",
-        category: "snack",
-        address: "Astro Hill Complex, Iqaluit, NU",
-        lat: 63.7475,
-        lng: -68.5141,
-        img: "https://www.frobisherinn.com/files/4527/frobisher_inn_colour.png",
-        note: "Enjoy the outdoor adventures in the crisp air with a trail hike, snowmobile ride or a watery swoosh of a kayak blade.",
-        officialLink: "https://www.frobisherinn.com/"
-    },
-    {
-        id: 3,
-        name: "Astro Theatre",
-        category: "sight",
-        address: "Astro Hill Complex, Iqaluit, NU",
-        lat: 63.7478,
-        lng: -68.5144,
-        img: "https://astrotheatre.ca/wp-content/uploads/2014/05/AstroTheatre-Logo_blue_web_phone_403px-4.png",
-        note: "The Astro Hill Complex structure in Iqaluit, Nunavut.",
-        officialLink: "https://astrotheatre.ca/"
-    },
-    {
-        id: 4,
-        name: "CBC Nunavut",
-        category: "sight",
-        address: "Building 224, Iqaluit, NU",
-        lat: 63.7452,
-        lng: -68.5155,
-        img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167",
-        officialLink: "https://www.cbc.ca/news/canada/north"
-    },
-    {
-        id: 5,
-        name: "Northern/Northmart",
-        category: "snack",
-        address: "Aqqaluk Rd, Iqaluit, NU",
-        lat: 63.7481,
-        lng: -68.5189,
-        img: "https://northmart.ca/wp-content/uploads/2025/03/ncr_brandHead.svg",
-        officialLink: "https://northmart.ca/"
-    },
-    {
-        id: 6,
-        name: "Legislative Assembly of Nunavut",
-        category: "sight",
-        address: "926 Unikkaarvik Rd",
-        lat: 63.7495,
-        lng: -68.5162,
-        img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9",
-        officialLink: "http://www.assembly.nu.ca/"
-    },
-    {
-        id: 7,
-        name: "Unikkaarvik Visitor Centre",
-        category: "sight",
-        address: "220 Unikkaarvik Rd",
-        lat: 63.7438,
-        lng: -68.5150,
-        img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1",
-        officialLink: "https://www.facebook.com/Unikkaarvik/"
-    },
-    {
-        id: 8,
-        name: "St. Jude's Anglican Cathedral",
-        category: "sight",
-        address: "Mattaaq St",
-        lat: 63.7463,
-        lng: -68.5147,
-        img: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092",
-        note: "St. Jude's Cathedral is the Anglican cathedral in Iqaluit, Nunavut. The cathedral is the seat of the Diocese of The Arctic.",
-        officialLink: "https://iqaluitcathedral.ca/"
-    },
-    {
-        id: 9,
-        name: "Akausisarvik Mental Health Facility",
-        category: "sight",
-        address: "503 Niaqunngusiariaq, Iqaluit, NU",
-        lat: 63.7505,
-        lng: -68.5080,
-        img: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d",
-        note: "Akausisarvik Mental Health Facility provides community health and mental health support services.",
-        officialLink: "https://www.gov.nu.ca/health"
-    },
-    {
-        id: 10,
-        name: "Inuksuk High School",
-        category: "sight",
-        address: "501 Niaqunngusiariaq, Iqaluit, NU",
-        lat: 63.7492,
-        lng: -68.5139,
-        img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b",
-        note: "Inuksuk High School is the high school of Iqaluit, Nunavut.",
-        officialLink: "https://www.facebook.com/inuksukhighschool/"
-    },
-    {
-        id: 11,
-        name: "Stay By The Sea",
-        category: "sight",
-        address: "2536 Paurngaq, Iqaluit, NU",
-        lat: 63.7402,
-        lng: -68.5125,
-        img: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
-        note: "Stay By The Sea is a 2-story boutique retreat and B&B located on a scenic hillside overlooking Frobisher Bay.",
-        officialLink: "https://www.staybythesea.ca/"
-    },
-    {
-        id: 12,
-        name: "Iqaluit International Airport",
-        category: "sight",
-        address: "Airport Rd, Iqaluit, NU",
-        lat: 63.7564,
-        lng: -68.5559,
-        img: "https://www.iqaluitairport.ca/sites/default/files/styles/header/public/2025-06/YFB-Terminal%20airside_header.jpg?itok=AJYII8Yy",
-        note: "Iqaluit International Airport is a great place to book flights and explore travel options.",
-        officialLink: "https://canadiannorth.com/"
-    },
-    {
-        id: 13,
-        name: "Historic Hudson's Bay Company Buildings (Apex)",
-        category: "sight",
-        address: "Apex Beach, Iqaluit, NU",
-        lat: 63.7225,
-        lng: -68.4481,
-        img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        note: "Historical trading post buildings originally constructed in Apex during the 1940s.",
-        officialLink: "https://travelnunavut.ca/"
-    },
-    {
-        id: 14,
-        name: "Apex Beach & Bridge",
-        category: "sight",
-        address: "Niaqunngut Rd, Apex, Iqaluit, NU",
-        lat: 63.7218,
-        lng: -68.4465,
-        img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-        note: "Scenic coastal shoreline in Apex overlooking Frobisher Bay and the trailhead for the Apex Trail.",
-        officialLink: "https://travelnunavut.ca/"
-    },
-    {
-        id: 15,
-        name: "Nanook Elementary School",
-        category: "sight",
-        address: "Apex Rd, Iqaluit, NU",
-        lat: 63.7245,
-        lng: -68.4512,
-        img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b",
-        note: "Elementary school serving the Apex community.",
-        officialLink: "https://www.gov.nu.ca/education"
-    },
-    {
-        id: 16,
-        name: "Quick Stop / Tim Hortons",
-        category: "snack",
-        address: "Apex Rd, Iqaluit, NU",
-        lat: 63.7455,
-        lng: -68.5162,
-        img: "https://cdn10.localdatacdn.com/nu/iqaluit/7089971/original/MoxidbrsEA.jpeg",
-        note: "Convenience store and Tim Hortons express location situated along Apex Road.",
-        officialLink: "https://www.timhortons.ca/"
-    },
-    {
-        id: 17,
-        name: "Arctic Ventures",
-        category: "snack",
-        address: "938 Queen St W, Iqaluit, NU",
-        lat: 63.7455,
-        lng: -68.5162,
-        img: "https://i.cbc.ca/ais/1.1559256,1379103204000/full/max/0/default.jpg?im=Crop%2Crect%3D%280%2C0%2C1180%2C663%29%3B",
-        note: "Popular grocery store and general merchant located in central Iqaluit.",
-        officialLink: "https://arcticventures.ca/"
-     }
- ];
+        const defaultLandmarks = [
+            {
+                id: 1,
+                name: "Black Heart Café",
+                category: "snack",
+                address: "Building 756, Iqaluit, NU",
+                lat: 63.7461,
+                lng: -68.5173,
+                img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24",
+                note: "We are hard-working, thirsty folk with big hearts...they just happen to be black.",
+                officialLink: "http://www.facebook.com/BlackHeartCafe/"
+            },
+            {
+                id: 2,
+                name: "Frobisher Inn",
+                category: "snack",
+                address: "Astro Hill Complex, Iqaluit, NU",
+                lat: 63.7475,
+                lng: -68.5141,
+                img: "https://www.frobisherinn.com/files/4527/frobisher_inn_colour.png",
+                note: "Enjoy the outdoor adventures in the crisp air with a trail hike, snowmobile ride or a watery swoosh of a kayak blade.",
+                officialLink: "https://www.frobisherinn.com/"
+            },
+            {
+                id: 3,
+                name: "Astro Theatre",
+                category: "sight",
+                address: "Astro Hill Complex, Iqaluit, NU",
+                lat: 63.7478,
+                lng: -68.5144,
+                img: "https://astrotheatre.ca/wp-content/uploads/2014/05/AstroTheatre-Logo_blue_web_phone_403px-4.png",
+                note: "The Astro Hill Complex structure in Iqaluit, Nunavut.",
+                officialLink: "https://astrotheatre.ca/"
+            },
+            {
+                id: 4,
+                name: "CBC Nunavut",
+                category: "sight",
+                address: "Building 224, Iqaluit, NU",
+                lat: 63.7452,
+                lng: -68.5155,
+                img: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167",
+                officialLink: "https://www.cbc.ca/news/canada/north"
+            },
+            {
+                id: 5,
+                name: "Northern/Northmart",
+                category: "snack",
+                address: "Aqqaluk Rd, Iqaluit, NU",
+                lat: 63.7481,
+                lng: -68.5189,
+                img: "https://northmart.ca/wp-content/uploads/2025/03/ncr_brandHead.svg",
+                officialLink: "https://northmart.ca/"
+            },
+            {
+                id: 6,
+                name: "Legislative Assembly of Nunavut",
+                category: "sight",
+                address: "926 Unikkaarvik Rd",
+                lat: 63.7495,
+                lng: -68.5162,
+                img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9",
+                officialLink: "http://www.assembly.nu.ca/"
+            },
+            {
+                id: 7,
+                name: "Unikkaarvik Visitor Centre",
+                category: "sight",
+                address: "220 Unikkaarvik Rd",
+                lat: 63.7438,
+                lng: -68.5150,
+                img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1",
+                officialLink: "https://www.facebook.com/Unikkaarvik/"
+            },
+            {
+                id: 8,
+                name: "St. Jude's Anglican Cathedral",
+                category: "sight",
+                address: "Mattaaq St",
+                lat: 63.7463,
+                lng: -68.5147,
+                img: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092",
+                note: "St. Jude's Cathedral is the Anglican cathedral in Iqaluit, Nunavut. The cathedral is the seat of the Diocese of The Arctic.",
+                officialLink: "https://iqaluitcathedral.ca/"
+            },
+            {
+                id: 9,
+                name: "Akausisarvik Mental Health Facility",
+                category: "sight",
+                address: "503 Niaqunngusiariaq, Iqaluit, NU",
+                lat: 63.7505,
+                lng: -68.5080,
+                img: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d",
+                note: "Akausisarvik Mental Health Facility provides community health and mental health support services.",
+                officialLink: "https://www.gov.nu.ca/health"
+            },
+            {
+                id: 10,
+                name: "Inuksuk High School",
+                category: "sight",
+                address: "501 Niaqunngusiariaq, Iqaluit, NU",
+                lat: 63.7492,
+                lng: -68.5139,
+                img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b",
+                note: "Inuksuk High School is the high school of Iqaluit, Nunavut.",
+                officialLink: "https://www.facebook.com/inuksukhighschool/"
+            },
+            {
+                id: 11,
+                name: "Stay By The Sea",
+                category: "sight",
+                address: "2536 Paurngaq, Iqaluit, NU",
+                lat: 63.7402,
+                lng: -68.5125,
+                img: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+                note: "Stay By The Sea is a 2-story boutique retreat and B&B located on a scenic hillside overlooking Frobisher Bay.",
+                officialLink: "https://www.staybythesea.ca/"
+            },
+            {
+                id: 12,
+                name: "Iqaluit International Airport",
+                category: "sight",
+                address: "Airport Rd, Iqaluit, NU",
+                lat: 63.7564,
+                lng: -68.5559,
+                img: "https://www.iqaluitairport.ca/sites/default/files/styles/header/public/2025-06/YFB-Terminal%20airside_header.jpg?itok=AJYII8Yy",
+                note: "Iqaluit International Airport is a great place to book flights and explore travel options.",
+                officialLink: "https://canadiannorth.com/"
+            },
+            {
+                id: 13,
+                name: "Historic Hudson's Bay Company Buildings (Apex)",
+                category: "sight",
+                address: "Apex Beach, Iqaluit, NU",
+                lat: 63.7225,
+                lng: -68.4481,
+                img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+                note: "Historical trading post buildings originally constructed in Apex during the 1940s.",
+                officialLink: "https://travelnunavut.ca/"
+            },
+            {
+                id: 14,
+                name: "Apex Beach & Bridge",
+                category: "sight",
+                address: "Niaqunngut Rd, Apex, Iqaluit, NU",
+                lat: 63.7218,
+                lng: -68.4465,
+                img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+                note: "Scenic coastal shoreline in Apex overlooking Frobisher Bay and the trailhead for the Apex Trail.",
+                officialLink: "https://travelnunavut.ca/"
+            },
+            {
+                id: 15,
+                name: "Nanook Elementary School",
+                category: "sight",
+                address: "Apex Rd, Iqaluit, NU",
+                lat: 63.7245,
+                lng: -68.4512,
+                img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b",
+                note: "Elementary school serving the Apex community.",
+                officialLink: "https://www.gov.nu.ca/education"
+            },
+            {
+                id: 16,
+                name: "Quick Stop / Tim Hortons",
+                category: "snack",
+                address: "Apex Rd, Iqaluit, NU",
+                lat: 63.7455,
+                lng: -68.5162,
+                img: "https://cdn10.localdatacdn.com/nu/iqaluit/7089971/original/MoxidbrsEA.jpeg",
+                note: "Convenience store and Tim Hortons express location situated along Apex Road.",
+                officialLink: "https://www.timhortons.ca/"
+            },
+            {
+                id: 17,
+                name: "Arctic Ventures",
+                category: "snack",
+                address: "938 Queen St W, Iqaluit, NU",
+                lat: 63.7455,
+                lng: -68.5162,
+                img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b",
+                note: "Popular grocery store and general merchant located in central Iqaluit.",
+                officialLink: "https://arcticventures.ca/"
+            }
+        ];
 
         let landmarks = JSON.parse(localStorage.getItem('iqaluit_landmarks')) || defaultLandmarks;
 
