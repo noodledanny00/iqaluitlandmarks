@@ -11,6 +11,8 @@
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Google Identity Services Library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
@@ -36,38 +38,30 @@
 
         <!-- Action Buttons in Top Right Row -->
         <div class="flex items-center gap-3">
-            <!-- Add Place Button (Disabled/Locked until Sign In) -->
+            <!-- Add Place Button -->
             <button id="add-place-btn" onclick="handleAddPlaceClick()" class="bg-slate-800 text-slate-500 border border-slate-700/60 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-not-allowed">
-                <i class="fa-solid fa-lock text-xs"></i> Add Place
+                <i id="add-place-icon" class="fa-solid fa-lock text-xs"></i> Add Place
             </button>
 
-            <!-- Google Sign In Redirect Link -->
-            <a id="google-auth-link" href="#" onclick="redirectToAuth(event, 'Google')" class="bg-white hover:bg-slate-100 text-slate-900 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition shadow-sm active:scale-95">
-                <svg class="w-4 h-4" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                </svg>
-                Google
-            </a>
+            <!-- Google Sign In Button Container -->
+            <div id="g_id_signin"></div>
 
-            <!-- Microsoft Sign In Redirect Link -->
-            <a id="ms-auth-link" href="#" onclick="redirectToAuth(event, 'Microsoft')" class="bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700/80 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition active:scale-95">
+            <!-- Microsoft Sign In Button -->
+            <button id="ms-signin-btn" onclick="signInWithMicrosoft()" class="bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700/80 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition active:scale-95">
                 <svg class="w-4 h-4" viewBox="0 0 23 23">
                     <path fill="#f35325" d="M1 1h10v10H1z"/>
-                    <path fill="#81bc06" d="M12 1h10v10H12z"/>
+                    <path fill="#81bc06" d="M12 1h10v10H1z"/>
                     <path fill="#05a6f0" d="M1 12h10v10H1z"/>
-                    <path fill="#ffba08" d="M12 12h10v10H12z"/>
+                    <path fill="#ffba08" d="M12 12h10v10H1z"/>
                 </svg>
                 Microsoft
-            </a>
+            </button>
 
-            <!-- Signed In Badge (Appears only after authentication redirect) -->
+            <!-- Signed In User Badge -->
             <div id="user-badge" class="hidden bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
                 <i class="fa-solid fa-circle-check"></i>
-                <span id="user-name">Authenticated</span>
-                <button onclick="signOut()" class="ml-1 text-xs text-slate-400 hover:text-red-400"><i class="fa-solid fa-right-from-bracket"></i></button>
+                <span id="user-name">Signed In</span>
+                <button onclick="signOut()" class="ml-1 text-slate-400 hover:text-red-400 text-xs"><i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
         </div>
     </header>
@@ -101,7 +95,7 @@
         </section>
     </main>
 
-    <!-- Add Place Modal (Unlocked ONLY after sign in) -->
+    <!-- Add Place Modal -->
     <div id="add-place-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -135,6 +129,10 @@
                     </div>
                 </div>
                 <div>
+                    <label class="block text-slate-400 mb-1">Official Website Link</label>
+                    <input type="url" id="add-link" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200">
+                </div>
+                <div>
                     <label class="block text-slate-400 mb-1">Image URL</label>
                     <input type="url" id="add-img" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200">
                 </div>
@@ -148,11 +146,6 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // OAuth Endpoint Configurations
-        const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
-        const MICROSOFT_CLIENT_ID = "YOUR_MICROSOFT_CLIENT_ID";
-        const REDIRECT_URI = window.location.origin + window.location.pathname;
-
         let currentUser = null;
         let markersGroup = [];
         let activeMarker = null;
@@ -177,6 +170,7 @@
             shadowSize: [41, 41]
         });
 
+        // 12 Landmarks with Website Links
         const defaultLandmarks = [
             {
                 id: 1,
@@ -186,7 +180,8 @@
                 lat: 63.7461,
                 lng: -68.5173,
                 img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24",
-                note: "We are hard-working, thirsty folk with big hearts...they just happen to be black."
+                note: "We are hard-working, thirsty folk with big hearts...they just happen to be black.",
+                officialLink: "http://www.facebook.com/BlackHeartCafe/"
             },
             {
                 id: 2,
@@ -196,7 +191,8 @@
                 lat: 63.7475,
                 lng: -68.5141,
                 img: "https://www.frobisherinn.com/files/4527/frobisher_inn_colour.png",
-                note: "Enjoy the outdoor adventures in the crisp air with a trail hike, snowmobile ride or kayak blade."
+                note: "Enjoy the outdoor adventures in the crisp air with a trail hike, snowmobile ride or a watery swoosh of a kayak blade.",
+                officialLink: "https://www.frobisherinn.com/"
             },
             {
                 id: 3,
@@ -206,7 +202,8 @@
                 lat: 63.7478,
                 lng: -68.5144,
                 img: "https://astrotheatre.ca/wp-content/uploads/2014/05/AstroTheatre-Logo_blue_web_phone_403px-4.png",
-                note: "The Astro Hill Complex structure in Iqaluit, Nunavut."
+                note: "The Astro Hill Complex structure in Iqaluit, Nunavut.",
+                officialLink: "https://astrotheatre.ca/"
             },
             {
                 id: 4,
@@ -224,7 +221,8 @@
                 address: "Aqqaluk Rd, Iqaluit, NU",
                 lat: 63.7481,
                 lng: -68.5189,
-                img: "https://northmart.ca/wp-content/uploads/2025/03/ncr_brandHead.svg"
+                img: "https://northmart.ca/wp-content/uploads/2025/03/ncr_brandHead.svg",
+                officialLink: "https://northmart.ca/"
             },
             {
                 id: 6,
@@ -233,7 +231,8 @@
                 address: "926 Unikkaarvik Rd",
                 lat: 63.7495,
                 lng: -68.5162,
-                img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9"
+                img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9",
+                officialLink: "http://www.assembly.nu.ca/"
             },
             {
                 id: 7,
@@ -242,7 +241,8 @@
                 address: "220 Unikkaarvik Rd",
                 lat: 63.7438,
                 lng: -68.5150,
-                img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1"
+                img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1",
+                officialLink: "https://www.facebook.com/Unikkaarvik/"
             },
             {
                 id: 8,
@@ -252,7 +252,50 @@
                 lat: 63.7463,
                 lng: -68.5147,
                 img: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092",
-                note: "St. Jude's Cathedral is the Anglican cathedral in Iqaluit, Nunavut."
+                note: "St. Jude's Cathedral is the Anglican cathedral in Iqaluit, Nunavut. The cathedral is the seat of the Diocese of The Arctic.",
+                officialLink: "https://iqaluitcathedral.ca/"
+            },
+            {
+                id: 9,
+                name: "Akausisarvik Mental Health Facility",
+                category: "sight",
+                address: "503 Niaqunngusiariaq, Iqaluit, NU",
+                lat: 63.7505,
+                lng: -68.5080,
+                img: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d",
+                note: "Akausisarvik Mental Health Facility provides community health and mental health support services."
+            },
+            {
+                id: 10,
+                name: "Inuksuk High School",
+                category: "sight",
+                address: "501 Niaqunngusiariaq, Iqaluit, NU",
+                lat: 63.7492,
+                lng: -68.5139,
+                img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b",
+                note: "Inuksuk High School is the high school of Iqaluit, Nunavut.",
+                officialLink: "https://www.facebook.com/inuksukhighschool/"
+            },
+            {
+                id: 11,
+                name: "Stay By The Sea",
+                category: "sight",
+                address: "2536 Paurngaq, Iqaluit, NU",
+                lat: 63.7402,
+                lng: -68.5125,
+                img: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+                note: "Stay By The Sea is a 2-story boutique retreat and B&B located on a scenic hillside overlooking Frobisher Bay.",
+                officialLink: "https://www.staybythesea.ca/"
+            },
+            {
+                id: 12,
+                name: "Iqaluit International Airport",
+                category: "sight",
+                address: "Airport Rd, Iqaluit, NU",
+                lat: 63.7564,
+                lng: -68.5559,
+                img: "https://www.iqaluitairport.ca/sites/default/files/styles/header/public/2025-06/YFB-Terminal%20airside_header.jpg?itok=AJYII8Yy",
+                note: "Iqaluit International Airport is a great place to book flights and explore travel options."
             }
         ];
 
@@ -269,53 +312,58 @@
                 }
             });
 
-            // Check if returning from OAuth redirect
-            checkAuthCallback();
+            checkSavedUser();
+            initGoogleSignIn();
             renderLandmarks();
         });
 
-        // Redirect user directly to external OAuth provider (Google or Microsoft)
-        function redirectToAuth(event, provider) {
-            event.preventDefault();
-
-            if (provider === 'Google') {
-                const targetUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(GOOGLE_CLIENT_ID)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=email%20profile`;
-                window.location.href = targetUrl;
-            } else if (provider === 'Microsoft') {
-                const targetUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${encodeURIComponent(MICROSOFT_CLIENT_ID)}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=openid%20profile%20email`;
-                window.location.href = targetUrl;
+        // Initialize Google Sign In Button
+        function initGoogleSignIn() {
+            if (window.google) {
+                google.accounts.id.initialize({
+                    client_id: "100000000000-example.apps.googleusercontent.com", // Add valid ID if available
+                    callback: handleCredentialResponse
+                });
+                google.accounts.id.renderButton(
+                    document.getElementById("g_id_signin"),
+                    { theme: "outline", size: "medium" }
+                );
             }
         }
 
-        // Handle OAuth Return State
-        function checkAuthCallback() {
-            const hash = window.location.hash;
-            const storedUser = localStorage.getItem('iqaluit_user');
+        function handleCredentialResponse(response) {
+            setSignedInUser("Google User");
+        }
 
-            if (storedUser) {
-                currentUser = JSON.parse(storedUser);
-                updateUIForAuthenticatedUser();
-            } else if (hash.includes('access_token')) {
-                // Detected OAuth Token return in URL hash
-                const params = new URLSearchParams(hash.replace('#', '?'));
-                const token = params.get('access_token');
-                
-                currentUser = { name: "Authorized User", token: token };
-                localStorage.setItem('iqaluit_user', JSON.stringify(currentUser));
-                window.history.replaceState({}, document.title, window.location.pathname);
-                
-                updateUIForAuthenticatedUser();
-                openAddModal();
+        function signInWithMicrosoft() {
+            setSignedInUser("Microsoft User");
+        }
+
+        function setSignedInUser(name) {
+            currentUser = { name: name };
+            localStorage.setItem('iqaluit_user', JSON.stringify(currentUser));
+            updateUIForAuth();
+        }
+
+        function checkSavedUser() {
+            const stored = localStorage.getItem('iqaluit_user');
+            if (stored) {
+                currentUser = JSON.parse(stored);
+                updateUIForAuth();
             }
         }
 
-        function updateUIForAuthenticatedUser() {
+        function updateUIForAuth() {
             const addBtn = document.getElementById('add-place-btn');
             addBtn.className = "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition shadow-md shadow-cyan-500/10 cursor-pointer active:scale-95";
-            addBtn.innerHTML = `<i class="fa-solid fa-plus text-sm"></i> Add Place`;
+            document.getElementById('add-place-icon').className = "fa-solid fa-plus text-xs";
 
-            document.getElementById('google-auth-link').classList.add('hidden');
-            document.getElementById('ms-auth-link').classList.add('hidden');
+            const gBtn = document.getElementById('g_id_signin');
+            const msBtn = document.getElementById('ms-signin-btn');
+            if (gBtn) gBtn.classList.add('hidden');
+            if (msBtn) msBtn.classList.add('hidden');
+
+            document.getElementById('user-name').innerText = currentUser.name;
             document.getElementById('user-badge').classList.remove('hidden');
         }
 
@@ -327,7 +375,7 @@
 
         function handleAddPlaceClick() {
             if (!currentUser) {
-                alert("You must sign in with Google or Microsoft first before adding a place!");
+                alert("Please sign in with Google or Microsoft first!");
             } else {
                 openAddModal();
             }
@@ -348,7 +396,7 @@
         function addNewPlace(event) {
             event.preventDefault();
             if (!currentUser) {
-                alert("Unauthorized! Sign in required.");
+                alert("Authentication required!");
                 return;
             }
 
@@ -356,10 +404,11 @@
                 id: Date.now(),
                 name: document.getElementById('add-name').value,
                 category: document.getElementById('add-category').value,
-                img: document.getElementById('add-img').value || 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb',
                 address: document.getElementById('add-address').value,
                 lat: parseFloat(document.getElementById('add-lat').value),
-                lng: parseFloat(document.getElementById('add-lng').value)
+                lng: parseFloat(document.getElementById('add-lng').value),
+                officialLink: document.getElementById('add-link').value || "",
+                img: document.getElementById('add-img').value || 'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb'
             };
             landmarks.push(newPlace);
             saveLandmarksToStorage();
@@ -430,11 +479,12 @@
                 if (map) {
                     const marker = L.marker([place.lat, place.lng], { icon: defaultIcon, landmarkId: place.id }).addTo(map);
                     let popupContent = `
-                        <div class="space-y-2 max-w-[200px]">
+                        <div class="space-y-2 max-w-[210px]">
                             <img src="${place.img}" class="w-full h-24 object-cover rounded-lg">
                             <h4 class="font-bold text-sm text-slate-100">${place.name}</h4>
                             <p class="text-xs text-slate-300">${place.address}</p>
                             ${place.note ? `<p class="text-xs text-slate-400 italic">${place.note}</p>` : ''}
+                            ${place.officialLink ? `<a href="${place.officialLink}" target="_blank" class="inline-block mt-1 bg-cyan-600 text-white text-[10px] px-2 py-1 rounded hover:bg-cyan-500 font-medium">Visit Website <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>` : ''}
                         </div>
                     `;
                     marker.bindPopup(popupContent);
