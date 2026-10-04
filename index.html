@@ -324,18 +324,10 @@
             map = L.map('map').setView([63.7467, -68.5170], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-            map.on('popupclose', () => {
-                if (activeMarker) {
-                    activeMarker.setIcon(defaultIcon);
-                    activeMarker = null;
-                }
-            });
-
             await checkActiveAccount();
             renderLandmarks();
         });
 
-        // Check if user is already logged in with MSAL
         async function checkActiveAccount() {
             const accounts = msalInstance.getAllAccounts();
             if (accounts.length > 0) {
@@ -348,7 +340,6 @@
             }
         }
 
-        // Popup Login Flow
         async function signInWithMicrosoft() {
             try {
                 const loginResponse = await msalInstance.loginPopup({
@@ -362,7 +353,6 @@
             }
         }
 
-        // Popup Logout Flow
         async function signOutWithMicrosoft() {
             try {
                 const currentAccount = msalInstance.getActiveAccount();
@@ -463,7 +453,9 @@
                 map.setView([place.lat, place.lng], 15);
                 const marker = markersGroup.find(m => m.options.landmarkId === id);
                 if (marker) {
-                    marker.openPopup();
+                    if (activeMarker) activeMarker.setIcon(defaultIcon);
+                    marker.setIcon(selectedIcon);
+                    activeMarker = marker;
                 }
             }
         }
@@ -503,20 +495,12 @@
 
                 if (map) {
                     const marker = L.marker([place.lat, place.lng], { icon: defaultIcon, landmarkId: place.id }).addTo(map);
-                    let popupContent = `
-                        <div class="space-y-2 max-w-[210px]">
-                            <img src="${place.img}" class="w-full h-24 object-cover rounded-lg">
-                            <h4 class="font-bold text-sm text-slate-100">${place.name}</h4>
-                            <p class="text-xs text-slate-300">${place.address}</p>
-                            ${place.note ? `<p class="text-xs text-slate-400 italic">${place.note}</p>` : ''}
-                            ${place.officialLink ? `<a href="${place.officialLink}" target="_blank" class="inline-block mt-1 bg-cyan-600 text-white text-[10px] px-2 py-1 rounded hover:bg-cyan-500 font-medium">Visit Website <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>` : ''}
-                        </div>
-                    `;
-                    marker.bindPopup(popupContent);
+                    
                     marker.on('click', () => {
                         if (activeMarker) activeMarker.setIcon(defaultIcon);
                         marker.setIcon(selectedIcon);
                         activeMarker = marker;
+                        map.setView([place.lat, place.lng], 15);
                     });
                     markersGroup.push(marker);
                 }
