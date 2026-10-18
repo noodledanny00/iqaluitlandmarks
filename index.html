@@ -47,39 +47,32 @@
                         <i class="fa-solid fa-compass text-sm"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-sm tracking-wide text-slate-100 flex items-center gap-1.5" id="appTitle">
+                        <h1 class="font-bold text-sm tracking-wide text-slate-100 flex items-center gap-1.5">
                             Iqaluit Landmarks <span class="text-[10px] bg-cyan-900/60 text-cyan-300 px-1.5 py-0.5 rounded border border-cyan-700">ᐃᖃᓗᐃᑦ</span>
                         </h1>
-                        <p class="text-[11px] text-slate-400 flex items-center gap-1" id="appSubtitle">
+                        <p class="text-[11px] text-slate-400 flex items-center gap-1">
                             <i class="fa-solid fa-location-dot text-rose-400 text-[10px]"></i> Nunavut, Canada
                         </p>
                     </div>
                 </div>
 
-                <!-- Action Buttons: Language Toggle, Add Place, Caribou Cabs & Sign in with Microsoft -->
+                <!-- Action Buttons: Add Place, Caribou Cabs & Sign in with Microsoft -->
                 <div class="flex items-center gap-1.5">
-                    <!-- Language Switcher EN / Inuktitut -->
-                    <button onclick="toggleLanguage()" id="langBtn" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-[10px] font-bold px-2 py-1.5 rounded-lg border border-slate-600 transition shadow-sm" title="Toggle English / Inuktitut">
-                        EN | ᐃᓄ
+                    <button onclick="toggleLanguage()" id="langToggleBtn" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 text-[10px] font-bold px-2 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1 transition">
+                        🌐 <span id="langBtnText">ᐃᓄ / EN</span>
                     </button>
-                    
-                    <button onclick="openModal('addPlaceModal')" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] font-medium px-2 py-1.5 rounded-lg border border-slate-600 flex items-center gap-1 transition shadow-sm">
-                        <i class="fa-solid fa-plus text-[10px]"></i> <span id="addBtnText">Add</span>
+                    <button onclick="openModal('addPlaceModal')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-medium px-2 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1 transition">
+                        <i class="fa-solid fa-plus text-[10px]"></i> <span data-i18n="add">Add</span>
                     </button>
-
                     <!-- Caribou Cabs Button with Official Logo -->
-                    <button onclick="openModal('caribouModal')" class="bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/50 text-amber-300 text-[11px] font-semibold px-2 py-1 rounded-lg flex items-center gap-1.5 transition shadow-sm" title="Caribou Cabs">
-                        <img src="https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/34/a5/0d/34a50def-a838-5a06-398d-94b742d35e16/Caribou_Cabs-0-1x_U007emarketing-0-85-220-7.png/400x400ia-75.webp" 
-                             alt="Caribou Cabs" 
-                             class="w-5 h-5 rounded object-cover border border-amber-400/40"
-                             onerror="this.onerror=null; this.src='https://placehold.co/40x40/f59e0b/ffffff?text=CC';">
-                        <span id="cabsBtnText">Cabs</span>
+                    <button onclick="openModal('caribouModal')" class="bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-semibold px-2 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm" title="Caribou Cabs">
+                        <img src="https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/34/a5/0d/34a50def-a838-5a06-398d-94b742d35e16/Caribou_Cabs-0-1x_U007emarketing-0-85-220-7.png/400x400ia-75.webp" onerror="this.src='https://placehold.co/400x400/d97706/ffffff?text=Cabs'" alt="Caribou Cabs Logo" class="w-4 h-4 rounded-full object-cover border border-amber-300">
+                        <span class="whitespace-nowrap">Caribou Cabs</span>
                     </button>
-
                     <!-- Sign in with Microsoft -->
-                    <button onclick="simulateMicrosoftLogin()" class="bg-[#2f2f2f] hover:bg-[#3f3f3f] text-slate-100 text-[11px] font-medium px-2 py-1.5 rounded-lg border border-slate-600 flex items-center gap-1.5 transition shadow-sm">
+                    <button onclick="simulateMicrosoftLogin()" class="bg-[#2f2f2f] hover:bg-[#3f3f3f] text-slate-100 text-[11px] font-medium px-2 py-1.5 rounded-lg border border-slate-600 flex items-center gap-1.5 transition shrink-0">
                         <svg class="w-3 h-3" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
-                        <span id="signInBtnText">Sign In</span>
+                        <span class="whitespace-nowrap" data-i18n="signIn">Sign In</span>
                     </button>
                 </div>
             </div>
@@ -92,6 +85,7 @@
                 </div>
                 <div class="flex items-center gap-1 overflow-x-auto pb-1 text-[11px] scrollbar-none">
                     <button onclick="setCategory('all')" id="cat-all" class="category-btn bg-cyan-600 text-white px-3 py-1 rounded-full font-medium shrink-0 transition">All / ᑕᒪᕐᒥᒃ</button>
+                    <button onclick="setCategory('hotels')" id="cat-hotels" class="category-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1 rounded-full font-medium shrink-0 transition">Hotels / ᑐᔪᕐᒥᕕᒃ</button>
                     <button onclick="setCategory('sights')" id="cat-sights" class="category-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1 rounded-full font-medium shrink-0 transition">Sights / ᑕᑯᒥᓇᖅᑐᑦ</button>
                     <button onclick="setCategory('food')" id="cat-food" class="category-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1 rounded-full font-medium shrink-0 transition">Food / ᓂᕆᕕᐊᓗᐃᑦ</button>
                     <button onclick="toggleWeather()" id="cat-weather" class="category-btn bg-sky-900/60 border border-sky-700 text-sky-300 hover:bg-sky-900 px-3 py-1 rounded-full font-medium shrink-0 transition flex items-center gap-1">
@@ -145,22 +139,21 @@
             <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-sm p-5 shadow-2xl relative">
                 <button onclick="closeModal('caribouModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 <div class="flex items-center gap-3 mb-4">
-                    <img src="https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/34/a5/0d/34a50def-a838-5a06-398d-94b742d35e16/Caribou_Cabs-0-1x_U007emarketing-0-85-220-7.png/400x400ia-75.webp" 
-                         alt="Caribou Cabs Logo" 
-                         class="w-12 h-12 rounded-xl object-cover border border-amber-500/50 shadow-md"
-                         onerror="this.onerror=null; this.src='https://placehold.co/80x80/f59e0b/ffffff?text=CC';">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 text-lg">
+                        <i class="fa-solid fa-taxi"></i>
+                    </div>
                     <div>
                         <h3 class="font-bold text-base text-slate-100">Caribou Cabs</h3>
-                        <p class="text-xs text-amber-400">Iqaluit Taxi Service · ᑐᐊᕕᕐᓇᖅᑐᖅ ᖃᑕᐅᔭᖅ</p>
+                        <p class="text-xs text-amber-400">Iqaluit Local Taxi Service</p>
                     </div>
                 </div>
                 <div class="space-y-3 text-xs text-slate-300 mb-5">
                     <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                        <p class="font-semibold text-slate-200 mb-1">📞 Dispatch Numbers / ᐅᖄᓚᐅᑦ:</p>
+                        <p class="font-semibold text-slate-200 mb-1">📞 Dispatch Numbers:</p>
                         <p class="text-cyan-400 font-mono text-sm font-bold">+1 (867) 979-2121</p>
                         <p class="text-cyan-400 font-mono text-sm font-bold">+1 (867) 979-8294</p>
                     </div>
-                    <p class="text-slate-400" id="caribouDesc">Available 24/7 for local rides across Apex, Astro Hill, Iqaluit Airport, and townsite locations.</p>
+                    <p class="text-slate-400">Available 24/7 for local rides across Apex, Astro Hill, Iqaluit Airport, and townsite locations.</p>
                 </div>
                 <button onclick="closeModal('caribouModal')" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium py-2.5 rounded-xl transition shadow-md">Close</button>
             </div>
@@ -180,6 +173,7 @@
                     <div>
                         <label class="block text-[11px] font-medium text-slate-300 mb-1">Category</label>
                         <select id="newCategory" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                            <option value="hotels">Hotel / Accommodation</option>
                             <option value="sights">Sight / Attraction</option>
                             <option value="food">Food & Drink</option>
                         </select>
@@ -207,110 +201,118 @@
 
     <!-- Application Logic -->
     <script>
-        let currentLang = 'en'; // 'en' or 'iu'
+        let currentLang = 'en';
 
         const translations = {
             en: {
-                title: 'Iqaluit Landmarks',
-                subtitle: 'Nunavut, Canada',
-                addBtn: 'Add',
-                cabsBtn: 'Cabs',
-                signInBtn: 'Sign In',
-                searchPlaceholder: 'Search Iqaluit landmarks...',
-                drawerTitle: 'Landmarks List',
-                caribouDesc: 'Available 24/7 for local rides across Apex, Astro Hill, Iqaluit Airport, and townsite locations.'
+                title: "Iqaluit Landmarks",
+                add: "Add",
+                signIn: "Sign In",
+                searchPlaceholder: "Search Iqaluit landmarks...",
+                catAll: "All / ᑕᒪᕐᒥᒃ",
+                catHotels: "Hotels / ᑐᔪᕐᒥᕕᒃ",
+                catSights: "Sights / ᑕᑯᒥᓇᖅᑐᑦ",
+                catFood: "Food / ᓂᕆᕕᐊᓗᐃᑦ",
+                catWeather: "Weather (CYFB)",
+                landmarksList: "Landmarks List",
+                open247: "Open 24/7",
+                officialWebsite: "Official Website",
+                tapToView: "Tap to view on map",
+                noResults: "No landmarks found."
             },
             iu: {
-                title: 'ᐃᖃᓗᐃᑦ ᑕᑯᒥᓇᖅᑐᑦ',
-                subtitle: 'ᓄᓇᕗᑦ, ᑲᓇᑕ',
-                addBtn: 'ᐃᓚᓯᒍᑦ',
-                cabsBtn: 'ᖃᑕᐅᔭᖅ',
-                signInBtn: 'ᐃᓯᕐᓗᑎᑦ',
-                searchPlaceholder: 'ᕿᓂᕐᓗᒋᑦ ᐃᖃᓗᐃᑦ ᑕᑯᒥᓇᖅᑐᑦ...',
-                drawerTitle: 'ᑕᑯᒥᓇᖅᑐᑦ ᑎᑎᕋᖅᓯᒪᔪᑦ',
-                caribouDesc: 'ᐊᑐᐃᓐᓇᐅᔪᑦ 24/7 ᐃᖃᓗᓐᓂ ᐊᒻᒪ ᓂᐊᖁᓐᒎᒥ.'
+                title: "ᐃᖃᓗᐃᑦ ᑕᑯᒥᓇᖅᑐᑦ",
+                add: "ᐃᓚᓯᒍᑦ",
+                signIn: "ᖃᕆᑕᐅᔭᒃᑯᑦ ᐃᓯᕐᓗᑎᑦ",
+                searchPlaceholder: "ᕿᓃᕐᓗᒋᑦ ᐃᖃᓗᐃᑦ ᑕᑯᒥᓇᖅᑐᑦ...",
+                catAll: "ᑕᒪᕐᒥᒃ",
+                catHotels: "ᑐᔪᕐᒥᕕᒃ",
+                catSights: "ᑕᑯᒥᓇᖅᑐᑦ",
+                catFood: "ᓂᕆᕕᐊᓗᐃᑦ",
+                catWeather: "ᓯᓚ (CYFB)",
+                landmarksList: "ᑕᑯᒥᓇᖅᑐᑦ ᐊᑎᖏᑦ",
+                open247: "ᒪᑐᐃᖓᐃᓐᓇᖅᑐᖅ",
+                officialWebsite: "ᖃᕆᑕᐅᔭᒃᑯᑦ ᑕᑯᒋᐊᕐᕕᒃ",
+                tapToView: "ᓇ anyᖓᕐᓗᒍ ᑕᑯᔪᒪᒍᕕᐅᒃ",
+                noResults: "ᓇᓂᓯᔪᖃᙱᑦᑐᖅ."
             }
         };
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'iu' : 'en';
-            const t = translations[currentLang];
-
-            document.getElementById('addBtnText').innerText = t.addBtn;
-            document.getElementById('cabsBtnText').innerText = t.cabsBtn;
-            document.getElementById('signInBtnText').innerText = t.signInBtn;
-            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
-            document.getElementById('drawerTitle').childNodes[0].nodeValue = t.drawerTitle + ' ';
-            document.getElementById('caribouDesc').innerText = t.caribouDesc;
-            document.getElementById('langBtn').innerText = currentLang === 'en' ? 'EN | ᐃᓄ' : 'ᐃᓄ | EN';
-
-            showToast(currentLang === 'en' ? 'Language switched to English' : 'ᐅᖃᐅᓯᖅ ᐊᓯᔾᔨᖅᑐᖅ ᐃᓄᒃᑎᑐᑦ');
-        }
 
         // Landmark Database
         const landmarks = [
             {
                 id: 1,
-                name: "Black Heart Café",
-                category: "food",
-                address: "Building 756, Iqaluit, NU",
-                hours: "Open · Closes 5:00 p.m.",
-                desc: "We are hard-working, thirsty folk with big hearts... they just happen to be black.",
-                website: "https://www.facebook.com/blackheartcafeiqaluit/",
-                lat: 63.7485,
-                lng: -68.5175
-            },
-            {
-                id: 2,
                 name: "Frobisher Inn",
-                category: "sights",
-                address: "Astro Hill Complex, Iqaluit, NU",
+                category: "hotels",
+                address: "505 Astro Hill Ter, Iqaluit, NU X0A 2H0",
                 hours: "Open 24/7",
-                desc: "Enjoy the outdoor adventures in the crisp air with a trail hike, snowmobile ride or a watery swoosh of a...",
+                desc: "Premier hotel in Iqaluit featuring stylish rooms, dining at the Gallery Restaurant, a sports bar, and full conference facilities.",
                 website: "https://www.frobisherinn.com",
                 lat: 63.7492,
                 lng: -68.5190
             },
             {
+                id: 2,
+                name: "Black Heart Café",
+                category: "food",
+                address: "Building 756, Iqaluit, NU",
+                hours: "Open · Closes 5:00 p.m.",
+                desc: "Cozy local cafe serving artisanal coffee, fresh baked goods, and meals in downtown Iqaluit.",
+                website: "https://www.facebook.com/blackheartcafeiqaluit/",
+                lat: 63.7485,
+                lng: -68.5175
+            },
+            {
                 id: 3,
+                name: "Aqsarniit Hotel & Conference Centre",
+                category: "hotels",
+                address: "1730 Federal Rd, Iqaluit, NU X0A 0A1",
+                hours: "Open 24/7",
+                desc: "100% Inuit-owned full-service hotel featuring modern guest rooms, dining, lounge, and event facilities.",
+                website: "https://aqsarniithotel.ca/",
+                lat: 63.7530,
+                lng: -68.5320
+            },
+            {
+                id: 4,
                 name: "Astro Theatre",
                 category: "sights",
                 address: "Astro Hill Complex, Iqaluit, NU",
                 hours: "Open · Closes 10:00 p.m.",
-                desc: "The Astro Hill Complex structure in Iqaluit, Nunavut.",
-                website: "https://www.astrothedatre.com",
+                desc: "Movie theater located within the Astro Hill Complex in Iqaluit, Nunavut.",
+                website: "https://www.astratheatre.ca",
                 lat: 63.7495,
                 lng: -68.5185
             },
             {
-                id: 4,
+                id: 5,
                 name: "CBC Nunavut",
                 category: "sights",
                 address: "Building 224, Iqaluit, NU",
                 hours: "Open · Closes 5:00 p.m.",
-                desc: "Local public broadcasting studio serving Nunavut in Inuktitut and English.",
+                desc: "Local public broadcasting studio serving Nunavut with news in Inuktitut and English.",
                 website: "https://www.cbc.ca/news/canada/north",
                 lat: 63.7460,
                 lng: -68.5140
             },
             {
-                id: 5,
-                name: "Northern/Northmart",
+                id: 6,
+                name: "Northern / Northmart",
                 category: "food",
                 address: "Queen Elizabeth Way, Iqaluit, NU",
                 hours: "Open · Closes 8:00 p.m.",
-                desc: "Main retail store providing groceries, clothing, and household goods in Iqaluit.",
+                desc: "Primary retail center providing groceries, household goods, and everyday supplies in Iqaluit.",
                 website: "https://www.thenorthernstores.ca",
                 lat: 63.7470,
                 lng: -68.5155
             },
             {
-                id: 6,
+                id: 7,
                 name: "Iqaluit Airport (CYFB)",
                 category: "sights",
                 address: "Iqaluit Airport, Nunavut",
                 hours: "Open 24/7",
-                desc: "Primary aviation hub connecting Nunavut to southern Canada.",
+                desc: "Main aviation hub connecting Nunavut communities and southern Canada.",
                 website: "https://flyiqaluit.com",
                 lat: 63.7575,
                 lng: -68.5530
@@ -322,7 +324,6 @@
         let currentCategory = 'all';
         let drawerExpanded = false;
 
-        // Initialize Map
         window.addEventListener('DOMContentLoaded', () => {
             // Center map on Iqaluit in portrait view
             map = L.map('map', {
@@ -335,13 +336,11 @@
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
-            // Add zoom control to top-left of map
             L.control.zoom({ position: 'topleft' }).addTo(map);
 
             renderLandmarks(landmarks);
         });
 
-        // Render Landmark Cards & Markers
         function renderLandmarks(items) {
             const listContainer = document.getElementById('landmarksList');
             listContainer.innerHTML = '';
@@ -352,7 +351,7 @@
             markers = {};
 
             if (items.length === 0) {
-                listContainer.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">No landmarks found.</div>`;
+                listContainer.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">${translations[currentLang].noResults}</div>`;
                 return;
             }
 
@@ -364,39 +363,36 @@
                 card.innerHTML = `
                     <div class="flex items-start justify-between">
                         <h4 class="font-bold text-xs text-slate-100">${item.name}</h4>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full ${item.category === 'food' ? 'bg-amber-900/50 text-amber-300 border border-amber-700' : 'bg-cyan-900/50 text-cyan-300 border border-cyan-700'}">${item.category}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full ${item.category === 'hotels' ? 'bg-indigo-900/50 text-indigo-300 border border-indigo-700' : item.category === 'food' ? 'bg-amber-900/50 text-amber-300 border border-amber-700' : 'bg-cyan-900/50 text-cyan-300 border border-cyan-700'}">${item.category}</span>
                     </div>
                     <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-location-dot text-[10px] text-rose-400"></i> ${item.address}</p>
                     <p class="text-[11px] text-emerald-400 mt-0.5"><i class="fa-solid fa-clock text-[10px]"></i> ${item.hours}</p>
                     <p class="text-[11px] text-slate-300 mt-1 line-clamp-2">${item.desc}</p>
                     <div class="mt-2 pt-2 border-t border-slate-700 flex justify-between items-center text-[11px]">
-                        <a href="${item.website}" target="_blank" onclick="event.stopPropagation()" class="text-cyan-400 hover:underline flex items-center gap-1 font-medium"><i class="fa-solid fa-globe"></i> Official Website</a>
-                        <span class="text-slate-500 text-[10px]">Tap to view on map</span>
+                        <a href="${item.website}" target="_blank" onclick="event.stopPropagation()" class="text-cyan-400 hover:underline flex items-center gap-1 font-medium"><i class="fa-solid fa-globe"></i> ${translations[currentLang].officialWebsite}</a>
+                        <span class="text-slate-500 text-[10px]">${translations[currentLang].tapToView}</span>
                     </div>
                 `;
                 listContainer.appendChild(card);
 
                 // Render Map Marker
                 const marker = L.marker([item.lat, item.lng]).addTo(map)
-                    .bindPopup(`<div class="text-slate-900 text-xs"><strong class="text-sm font-bold">${item.name}</strong><br>${item.address}<br><a href="${item.website}" target="_blank" class="text-cyan-600 font-semibold underline mt-1 inline-block">Official Website</a></div>`);
+                    .bindPopup(`<div class="text-slate-900 text-xs"><strong class="text-sm font-bold">${item.name}</strong><br>${item.address}<br><a href="${item.website}" target="_blank" class="text-cyan-600 font-semibold underline mt-1 inline-block">${translations[currentLang].officialWebsite}</a></div>`);
                 
                 markers[item.id] = marker;
             });
         }
 
-        // Focus Landmark on map
         function focusLandmark(item) {
             map.setView([item.lat, item.lng], 15, { animate: true });
             if (markers[item.id]) {
                 markers[item.id].openPopup();
             }
-            // Minimize drawer slightly on mobile to see map
             const drawer = document.getElementById('landmarksDrawer');
             drawer.style.maxHeight = '140px';
             drawerExpanded = false;
         }
 
-        // Toggle Drawer height
         function toggleDrawer() {
             const drawer = document.getElementById('landmarksDrawer');
             drawerExpanded = !drawerExpanded;
@@ -407,7 +403,6 @@
             }
         }
 
-        // Filter by category
         function setCategory(cat) {
             currentCategory = cat;
             document.querySelectorAll('.category-btn').forEach(btn => {
@@ -432,7 +427,6 @@
             }
         }
 
-        // Search filter
         function filterLandmarks() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = landmarks.filter(l => 
@@ -442,13 +436,11 @@
             renderLandmarks(filtered);
         }
 
-        // Weather widget toggle
         function toggleWeather() {
             const widget = document.getElementById('weatherWidget');
             widget.classList.toggle('hidden');
         }
 
-        // Modal Handlers
         function openModal(id) {
             document.getElementById(id).classList.remove('hidden');
         }
@@ -457,12 +449,10 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        // Microsoft Login Simulation
         function simulateMicrosoftLogin() {
             showToast("Microsoft Account signed in successfully (Iqaluit Gov domain).");
         }
 
-        // Handle Add New Landmark Form
         function handleAddNewPlace(e) {
             e.preventDefault();
             const name = document.getElementById('newName').value;
@@ -489,7 +479,27 @@
             showToast("Landmark added successfully!");
         }
 
-        // Toast Helper
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'iu' : 'en';
+            
+            // Update UI strings dynamically
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.innerText = translations[currentLang][key];
+                }
+            });
+
+            document.getElementById('searchInput').placeholder = translations[currentLang].searchPlaceholder;
+            document.getElementById('cat-all').innerText = translations[currentLang].catAll;
+            document.getElementById('cat-hotels').innerText = translations[currentLang].catHotels;
+            document.getElementById('cat-sights').innerText = translations[currentLang].catSights;
+            document.getElementById('cat-food').innerText = translations[currentLang].catFood;
+
+            // Re-render landmarks list with translated strings
+            renderLandmarks(landmarks.filter(l => currentCategory === 'all' || l.category === currentCategory));
+        }
+
         function showToast(text) {
             const toast = document.getElementById('toast');
             document.getElementById('toastText').innerText = text;
