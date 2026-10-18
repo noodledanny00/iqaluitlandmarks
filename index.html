@@ -47,28 +47,39 @@
                         <i class="fa-solid fa-compass text-sm"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-sm tracking-wide text-slate-100 flex items-center gap-1.5">
+                        <h1 class="font-bold text-sm tracking-wide text-slate-100 flex items-center gap-1.5" id="appTitle">
                             Iqaluit Landmarks <span class="text-[10px] bg-cyan-900/60 text-cyan-300 px-1.5 py-0.5 rounded border border-cyan-700">ᐃᖃᓗᐃᑦ</span>
                         </h1>
-                        <p class="text-[11px] text-slate-400 flex items-center gap-1">
+                        <p class="text-[11px] text-slate-400 flex items-center gap-1" id="appSubtitle">
                             <i class="fa-solid fa-location-dot text-rose-400 text-[10px]"></i> Nunavut, Canada
                         </p>
                     </div>
                 </div>
 
-                <!-- Action Buttons: Add Place, Caribou Cabs & Sign in with Microsoft -->
+                <!-- Action Buttons: Language Toggle, Add Place, Caribou Cabs & Sign in with Microsoft -->
                 <div class="flex items-center gap-1.5">
-                    <button onclick="openModal('addPlaceModal')" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] font-medium px-2.5 py-1.5 rounded-lg border border-slate-600 flex items-center gap-1 transition shadow-sm">
-                        <i class="fa-solid fa-plus text-[10px]"></i> Add
+                    <!-- Language Switcher EN / Inuktitut -->
+                    <button onclick="toggleLanguage()" id="langBtn" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-[10px] font-bold px-2 py-1.5 rounded-lg border border-slate-600 transition shadow-sm" title="Toggle English / Inuktitut">
+                        EN | ᐃᓄ
                     </button>
-                    <!-- Caribou Cabs Button -->
-                    <button onclick="openModal('caribouModal')" class="bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition shadow-sm" title="Caribou Cabs">
-                        <i class="fa-solid fa-taxi text-[10px]"></i> Cabs
+                    
+                    <button onclick="openModal('addPlaceModal')" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] font-medium px-2 py-1.5 rounded-lg border border-slate-600 flex items-center gap-1 transition shadow-sm">
+                        <i class="fa-solid fa-plus text-[10px]"></i> <span id="addBtnText">Add</span>
                     </button>
+
+                    <!-- Caribou Cabs Button with Official Logo -->
+                    <button onclick="openModal('caribouModal')" class="bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/50 text-amber-300 text-[11px] font-semibold px-2 py-1 rounded-lg flex items-center gap-1.5 transition shadow-sm" title="Caribou Cabs">
+                        <img src="https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/34/a5/0d/34a50def-a838-5a06-398d-94b742d35e16/Caribou_Cabs-0-1x_U007emarketing-0-85-220-7.png/400x400ia-75.webp" 
+                             alt="Caribou Cabs" 
+                             class="w-5 h-5 rounded object-cover border border-amber-400/40"
+                             onerror="this.onerror=null; this.src='https://placehold.co/40x40/f59e0b/ffffff?text=CC';">
+                        <span id="cabsBtnText">Cabs</span>
+                    </button>
+
                     <!-- Sign in with Microsoft -->
-                    <button onclick="simulateMicrosoftLogin()" class="bg-[#2f2f2f] hover:bg-[#3f3f3f] text-slate-100 text-[11px] font-medium px-2.5 py-1.5 rounded-lg border border-slate-600 flex items-center gap-1.5 transition shadow-sm">
+                    <button onclick="simulateMicrosoftLogin()" class="bg-[#2f2f2f] hover:bg-[#3f3f3f] text-slate-100 text-[11px] font-medium px-2 py-1.5 rounded-lg border border-slate-600 flex items-center gap-1.5 transition shadow-sm">
                         <svg class="w-3 h-3" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
-                        <span>Sign In</span>
+                        <span id="signInBtnText">Sign In</span>
                     </button>
                 </div>
             </div>
@@ -80,9 +91,9 @@
                     <input type="text" id="searchInput" oninput="filterLandmarks()" placeholder="Search Iqaluit landmarks..." class="w-full bg-slate-900/80 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                 </div>
                 <div class="flex items-center gap-1 overflow-x-auto pb-1 text-[11px] scrollbar-none">
-                    <button onclick="setCategory('all')" id="cat-all" class="category-btn bg-cyan-600 text-white px-3 py-1 rounded-full font-medium shrink-0 transition">All</button>
-                    <button onclick="setCategory('sights')" id="cat-sights" class="category-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1 rounded-full font-medium shrink-0 transition">Sights</button>
-                    <button onclick="setCategory('food')" id="cat-food" class="category-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1 rounded-full font-medium shrink-0 transition">Food & Drink</button>
+                    <button onclick="setCategory('all')" id="cat-all" class="category-btn bg-cyan-600 text-white px-3 py-1 rounded-full font-medium shrink-0 transition">All / ᑕᒪᕐᒥᒃ</button>
+                    <button onclick="setCategory('sights')" id="cat-sights" class="category-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1 rounded-full font-medium shrink-0 transition">Sights / ᑕᑯᒥᓇᖅᑐᑦ</button>
+                    <button onclick="setCategory('food')" id="cat-food" class="category-btn bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1 rounded-full font-medium shrink-0 transition">Food / ᓂᕆᕕᐊᓗᐃᑦ</button>
                     <button onclick="toggleWeather()" id="cat-weather" class="category-btn bg-sky-900/60 border border-sky-700 text-sky-300 hover:bg-sky-900 px-3 py-1 rounded-full font-medium shrink-0 transition flex items-center gap-1">
                         <i class="fa-solid fa-cloud-sun text-[10px]"></i> Weather (CYFB)
                     </button>
@@ -134,21 +145,22 @@
             <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-sm p-5 shadow-2xl relative">
                 <button onclick="closeModal('caribouModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 text-lg">
-                        <i class="fa-solid fa-taxi"></i>
-                    </div>
+                    <img src="https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/34/a5/0d/34a50def-a838-5a06-398d-94b742d35e16/Caribou_Cabs-0-1x_U007emarketing-0-85-220-7.png/400x400ia-75.webp" 
+                         alt="Caribou Cabs Logo" 
+                         class="w-12 h-12 rounded-xl object-cover border border-amber-500/50 shadow-md"
+                         onerror="this.onerror=null; this.src='https://placehold.co/80x80/f59e0b/ffffff?text=CC';">
                     <div>
                         <h3 class="font-bold text-base text-slate-100">Caribou Cabs</h3>
-                        <p class="text-xs text-amber-400">Iqaluit Local Taxi Service</p>
+                        <p class="text-xs text-amber-400">Iqaluit Taxi Service · ᑐᐊᕕᕐᓇᖅᑐᖅ ᖃᑕᐅᔭᖅ</p>
                     </div>
                 </div>
                 <div class="space-y-3 text-xs text-slate-300 mb-5">
                     <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                        <p class="font-semibold text-slate-200 mb-1">📞 Dispatch Numbers:</p>
+                        <p class="font-semibold text-slate-200 mb-1">📞 Dispatch Numbers / ᐅᖄᓚᐅᑦ:</p>
                         <p class="text-cyan-400 font-mono text-sm font-bold">+1 (867) 979-2121</p>
                         <p class="text-cyan-400 font-mono text-sm font-bold">+1 (867) 979-8294</p>
                     </div>
-                    <p class="text-slate-400">Available 24/7 for local rides across Apex, Astro Hill, Iqaluit Airport, and townsite locations.</p>
+                    <p class="text-slate-400" id="caribouDesc">Available 24/7 for local rides across Apex, Astro Hill, Iqaluit Airport, and townsite locations.</p>
                 </div>
                 <button onclick="closeModal('caribouModal')" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-medium py-2.5 rounded-xl transition shadow-md">Close</button>
             </div>
@@ -195,6 +207,46 @@
 
     <!-- Application Logic -->
     <script>
+        let currentLang = 'en'; // 'en' or 'iu'
+
+        const translations = {
+            en: {
+                title: 'Iqaluit Landmarks',
+                subtitle: 'Nunavut, Canada',
+                addBtn: 'Add',
+                cabsBtn: 'Cabs',
+                signInBtn: 'Sign In',
+                searchPlaceholder: 'Search Iqaluit landmarks...',
+                drawerTitle: 'Landmarks List',
+                caribouDesc: 'Available 24/7 for local rides across Apex, Astro Hill, Iqaluit Airport, and townsite locations.'
+            },
+            iu: {
+                title: 'ᐃᖃᓗᐃᑦ ᑕᑯᒥᓇᖅᑐᑦ',
+                subtitle: 'ᓄᓇᕗᑦ, ᑲᓇᑕ',
+                addBtn: 'ᐃᓚᓯᒍᑦ',
+                cabsBtn: 'ᖃᑕᐅᔭᖅ',
+                signInBtn: 'ᐃᓯᕐᓗᑎᑦ',
+                searchPlaceholder: 'ᕿᓂᕐᓗᒋᑦ ᐃᖃᓗᐃᑦ ᑕᑯᒥᓇᖅᑐᑦ...',
+                drawerTitle: 'ᑕᑯᒥᓇᖅᑐᑦ ᑎᑎᕋᖅᓯᒪᔪᑦ',
+                caribouDesc: 'ᐊᑐᐃᓐᓇᐅᔪᑦ 24/7 ᐃᖃᓗᓐᓂ ᐊᒻᒪ ᓂᐊᖁᓐᒎᒥ.'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'iu' : 'en';
+            const t = translations[currentLang];
+
+            document.getElementById('addBtnText').innerText = t.addBtn;
+            document.getElementById('cabsBtnText').innerText = t.cabsBtn;
+            document.getElementById('signInBtnText').innerText = t.signInBtn;
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            document.getElementById('drawerTitle').childNodes[0].nodeValue = t.drawerTitle + ' ';
+            document.getElementById('caribouDesc').innerText = t.caribouDesc;
+            document.getElementById('langBtn').innerText = currentLang === 'en' ? 'EN | ᐃᓄ' : 'ᐃᓄ | EN';
+
+            showToast(currentLang === 'en' ? 'Language switched to English' : 'ᐅᖃᐅᓯᖅ ᐊᓯᔾᔨᖅᑐᖅ ᐃᓄᒃᑎᑐᑦ');
+        }
+
         // Landmark Database
         const landmarks = [
             {
